@@ -52,7 +52,7 @@ namespace NotifyMe.UI
         {
             if (_tempSettings != null && ThemeComboBox.SelectedItem is ComboBoxItem item)
             {
-                _tempSettings.Theme = item.Content.ToString().Contains("Glass") ? "Glass" : "Classic";
+                _tempSettings.Theme = item.Content?.ToString()?.Contains("Glass") == true ? "Glass" : "Classic";
                 _settingsService.SaveSettings(_tempSettings);
             }
         }
@@ -83,7 +83,7 @@ namespace NotifyMe.UI
                 
                 _tempSettings.EnableSoundNotifications = SoundNotificationsCheckBox.IsChecked ?? false;
             }
-            _settingsService.SaveSettings(_tempSettings);
+                _settingsService.SaveSettings(_tempSettings);
             Close();
         }
 

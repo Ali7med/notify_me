@@ -16,6 +16,7 @@ public partial class App : Application
     private SettingsWindow? _settingsWindow;
     private HistoryWindow? _historyWindow;
     private SettingsService? _settingsService;
+    private SoundService? _soundService;
     private DataLogger? _dataLogger;
     private readonly AppSettings _settings = new();
 
@@ -29,6 +30,7 @@ public partial class App : Application
         var pingWrapper = new PingWrapper();
         
         _settingsService = new SettingsService();
+        _soundService = new SoundService();
         
         // Initialize DataLogger with error handling
         try
@@ -53,6 +55,13 @@ public partial class App : Application
         // Start monitoring
         _networkMonitor.Start();
         _trafficMonitor.Start();
+        
+        // Apply sound settings
+        if (_soundService != null)
+        {
+            _soundService.IsEnabled = _settingsService.CurrentSettings.EnableSoundNotifications;
+        }
+        
         // Show floating network usage icon
         _floatingIcon = new FloatingIconWindow(_networkMonitor, _trafficMonitor, _settingsService, ShowMainWindow, ShowSettingsWindow);
         _floatingIcon.Show();
@@ -68,10 +77,12 @@ public partial class App : Application
             if (e.EventType == ConnectionEventType.Disconnected)
             {
                 _notificationService?.ShowConnectionLost();
+                _soundService?.PlayConnectionLost();
             }
             else if (e.EventType == ConnectionEventType.Connected)
             {
                 _notificationService?.ShowConnectionRestored();
+                _soundService?.PlayConnectionRestored();
             }
 
             UpdateTrayIcon();

@@ -219,13 +219,39 @@ NotifyMe/
 
 ---
 
-## 🚀 **المراحل القادمة (من plan v1.md)**
+### **المرحلة 5: الإشعارات الصوتية** ✅ (مكتمل 100%)
+**التاريخ**: 23 نوفمبر 2025
 
-### **المرحلة 5: الإشعارات الصوتية** ⏳
-- [ ] إضافة `System.Media.SoundPlayer`
-- [ ] تشغيل صوت عند قطع الاتصال
-- [ ] تشغيل صوت عند استعادة الاتصال
-- [ ] استخدام إعداد `EnableSoundNotifications`
+#### الميزات المنفذة:
+
+##### **خدمة الصوت (SoundService):**
+- ✅ تشغيل صوت عند قطع الاتصال
+- ✅ تشغيل صوت عند استعادة الاتصال
+- ✅ التحقق من إعداد `EnableSoundNotifications` قبل التشغيل
+- ✅ معالجة الأخطاء لضمان عدم تعطل التطبيق
+
+##### **ملفات الصوت:**
+- ✅ تحميل `disconnect.wav` من Orange Free Sounds
+- ✅ تحميل `reconnect.wav` من Orange Free Sounds
+- ✅ موقع الملفات: `Resources/Sounds/`
+- ✅ استخدام `System.Media.SoundPlayer` للتشغيل
+
+##### **التكامل:**
+- ✅ دمج SoundService في `App.xaml.cs`
+- ✅ ربط مع حدث `ConnectionStateChanged`
+- ✅ تطبيق إعداد الصوت من Settings
+- ✅ إضافة مكتبة `System.Windows.Extensions`
+
+#### الملفات المتأثرة:
+- `NotifyMe.Core/Services/SoundService.cs` (جديد)
+- `NotifyMe.UI/Resources/Sounds/disconnect.wav` (جديد)
+- `NotifyMe.UI/Resources/Sounds/reconnect.wav` (جديد)
+- `NotifyMe.UI/App.xaml.cs` (تحديث)
+- `NotifyMe.Core/NotifyMe.Core.csproj` (تحديث)
+
+---
+
+## 🚀 **المراحل القادمة (من plan v1.md)**
 
 ### **المرحلة 6: Do Not Disturb** ⏳
 - [ ] إضافة جدول زمني في Settings
@@ -245,10 +271,10 @@ NotifyMe/
 
 ## 📊 **الإحصائيات**
 
-- **عدد الملفات المنشأة**: 15+
-- **عدد الملفات المعدلة**: 25+
-- **عدد الميزات المنفذة**: 40+
-- **نسبة الإنجاز من plan v1.md**: ~60%
+- **عدد الملفات المنشأة**: 18+
+- **عدد الملفات المعدلة**: 28+
+- **عدد الميزات المنفذة**: 45+
+- **نسبة الإنجاز من plan v1.md**: ~70%
 - **عدد الإصلاحات الحرجة**: 3
 
 ---
@@ -270,4 +296,4 @@ NotifyMe/
 
 ---
 
-**آخر تحديث**: 23 نوفمبر 2025، 13:56
+**آخر تحديث**: 23 نوفمبر 2025، 14:10

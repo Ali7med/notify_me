@@ -43,7 +43,7 @@
                 BorderThickness="1"
                 Margin="5">
             <Border.BorderBrush>
-                <SolidColorBrush x:Name="BorderBrush" Color="#4CC2FF"/>
+                <SolidColorBrush x:Name="IndicatorBorderBrush" Color="#4CC2FF"/>
             </Border.BorderBrush>
             <Border.Background>
                 <SolidColorBrush Color="#0A0A0A" Opacity="0.95"/>

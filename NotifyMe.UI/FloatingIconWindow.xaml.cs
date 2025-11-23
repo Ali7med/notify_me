@@ -132,7 +132,7 @@ namespace NotifyMe.UI
                 Opacity = 0.6 
             };
             
-            BorderBrush.Color = color;
+            IndicatorBorderBrush.Color = color;
         }
 
         private string FormatSpeed(double bytesPerSecond)
