@@ -12,7 +12,9 @@ public partial class App : Application
     private TrafficMonitor? _trafficMonitor;
     private NotificationService? _notificationService;
     private MainWindow? _mainWindow;
-        private FloatingIconWindow? _floatingIcon;
+    private FloatingIconWindow? _floatingIcon;
+    private SettingsWindow? _settingsWindow;
+    private SettingsService? _settingsService;
     private readonly AppSettings _settings = new();
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -23,6 +25,8 @@ public partial class App : Application
         // Initialize services
         var networkInterfaceWrapper = new NetworkInterfaceWrapper();
         var pingWrapper = new PingWrapper();
+        
+        _settingsService = new SettingsService();
 
         _notificationService = new NotificationService(_settings);
         _networkMonitor = new NetworkMonitor(networkInterfaceWrapper, pingWrapper) { CheckIntervalSeconds = _settings.CheckIntervalSeconds };
@@ -36,7 +40,7 @@ public partial class App : Application
         _networkMonitor.Start();
         _trafficMonitor.Start();
         // Show floating network usage icon
-        _floatingIcon = new FloatingIconWindow(_networkMonitor, _trafficMonitor, ShowMainWindow);
+        _floatingIcon = new FloatingIconWindow(_networkMonitor, _trafficMonitor, _settingsService, ShowMainWindow, ShowSettingsWindow);
         _floatingIcon.Show();
 
         // Update tray icon tooltip
@@ -99,10 +103,26 @@ public partial class App : Application
     {
         if (_floatingIcon == null)
         {
-             _floatingIcon = new FloatingIconWindow(_networkMonitor!, _trafficMonitor!, ShowMainWindow);
+             _floatingIcon = new FloatingIconWindow(_networkMonitor!, _trafficMonitor!, _settingsService!, ShowMainWindow, ShowSettingsWindow);
         }
         _floatingIcon.Show();
         _floatingIcon.Activate();
+    }
+
+    private void ShowSettings_Click(object sender, RoutedEventArgs e)
+    {
+        ShowSettingsWindow();
+    }
+
+    private void ShowSettingsWindow()
+    {
+        if (_settingsWindow == null)
+        {
+            _settingsWindow = new SettingsWindow(_settingsService!);
+            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+        }
+        _settingsWindow.Show();
+        _settingsWindow.Activate();
     }
 
     private void ShowMainWindow()
