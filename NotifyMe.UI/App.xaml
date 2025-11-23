@@ -1,0 +1,27 @@
+﻿<Application x:Class="NotifyMe.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:NotifyMe.UI"
+             xmlns:tb="http://www.hardcodet.net/taskbar"
+             Startup="Application_Startup"
+             Exit="Application_Exit">
+    <Application.Resources>
+        <!-- System Tray Icon -->
+        <tb:TaskbarIcon x:Key="NotifyIcon"
+                        IconSource="/Resources/icon.ico"
+                        ToolTipText="NotifyMe - Network Monitor"
+                        TrayMouseDoubleClick="TaskbarIcon_DoubleClick"
+                        MenuActivation="RightClick">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Show Statistics" Click="ShowWindow_Click" FontWeight="Bold"/>
+                    <Separator/>
+                    <MenuItem Header="Connection Status" IsEnabled="False"/>
+                    <MenuItem Header="Traffic Monitor" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem Header="Exit" Click="Exit_Click"/>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+    </Application.Resources>
+</Application>

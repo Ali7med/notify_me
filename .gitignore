@@ -1,0 +1,44 @@
+# .gitignore for NotifyMe solution
+# Build results
+bin/
+obj/
+
+# Visual Studio files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+*.vcxproj.filters
+*.csproj.user
+*.csproj.userprefs
+*.vspscc
+*.vssscc
+
+# Visual Studio Code settings
+.vscode/
+
+# Rider / ReSharper
+.idea/
+*.dotCover
+*.dotCover.report
+
+# NuGet packages folder (if using packages folder)
+packages/
+
+# Publish output
+publish/
+
+# Logs and temporary files
+*.log
+*.tlog
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.exe
+*.dll
+*.pdb
