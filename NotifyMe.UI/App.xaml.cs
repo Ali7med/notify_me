@@ -12,6 +12,7 @@ public partial class App : Application
     private TrafficMonitor? _trafficMonitor;
     private NotificationService? _notificationService;
     private MainWindow? _mainWindow;
+        private FloatingIconWindow? _floatingIcon;
     private readonly AppSettings _settings = new();
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -34,6 +35,9 @@ public partial class App : Application
         // Start monitoring
         _networkMonitor.Start();
         _trafficMonitor.Start();
+        // Show floating network usage icon
+        _floatingIcon = new FloatingIconWindow(_networkMonitor, _trafficMonitor, ShowMainWindow);
+        _floatingIcon.Show();
 
         // Update tray icon tooltip
         UpdateTrayIcon();
@@ -91,6 +95,16 @@ public partial class App : Application
         ShowMainWindow();
     }
 
+    private void ShowWidget_Click(object sender, RoutedEventArgs e)
+    {
+        if (_floatingIcon == null)
+        {
+             _floatingIcon = new FloatingIconWindow(_networkMonitor!, _trafficMonitor!, ShowMainWindow);
+        }
+        _floatingIcon.Show();
+        _floatingIcon.Activate();
+    }
+
     private void ShowMainWindow()
     {
         if (_mainWindow == null)
@@ -114,6 +128,7 @@ public partial class App : Application
         _networkMonitor?.Stop();
         _trafficMonitor?.Stop();
         _notifyIcon?.Dispose();
+        _floatingIcon?.Close();
     }
     private void TaskbarIcon_DoubleClick(object sender, RoutedEventArgs e)
     {
