@@ -71,11 +71,22 @@ public class NetworkMonitor
                     {
                         LatencyChanged?.Invoke(this, reply.RoundtripTime);
                     }
+                    else
+                    {
+                        // Ping failed (timeout, unreachable, etc.)
+                        LatencyChanged?.Invoke(this, -1);
+                    }
                 }
                 catch
                 {
-                    // Ignore ping errors for latency check
+                    // Error occurred during ping
+                    LatencyChanged?.Invoke(this, -1);
                 }
+            }
+            else
+            {
+                // Not connected, show timeout
+                LatencyChanged?.Invoke(this, -1);
             }
 
             UpdateConnectionState(isConnected);

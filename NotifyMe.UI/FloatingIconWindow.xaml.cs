@@ -60,12 +60,21 @@ namespace NotifyMe.UI
         {
             Dispatcher.Invoke(() =>
             {
-                PingText.Text = $"{latency} ms";
-                
-                // Color code latency
-                if (latency < 50) PingText.Foreground = new SolidColorBrush(Color.FromRgb(76, 255, 76)); // Green
-                else if (latency < 150) PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 215, 0)); // Yellow
-                else PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 76, 76)); // Red
+                if (latency < 0)
+                {
+                    // Timeout or error
+                    PingText.Text = "TIMEOUT";
+                    PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 76, 76)); // Red
+                }
+                else
+                {
+                    PingText.Text = $"{latency} ms";
+                    
+                    // Color code latency
+                    if (latency < 50) PingText.Foreground = new SolidColorBrush(Color.FromRgb(76, 255, 76)); // Green
+                    else if (latency < 150) PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 215, 0)); // Yellow
+                    else PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 76, 76)); // Red
+                }
             });
         }
 

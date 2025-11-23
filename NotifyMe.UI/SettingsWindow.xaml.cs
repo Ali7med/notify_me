@@ -55,7 +55,17 @@ namespace NotifyMe.UI
         {
             if (_tempSettings != null)
             {
-                _tempSettings.PingHost = PingHostTextBox.Text;
+                var pingHost = PingHostTextBox.Text.Trim();
+                
+                // Basic validation - check if not empty
+                if (string.IsNullOrWhiteSpace(pingHost))
+                {
+                    System.Windows.MessageBox.Show("Please enter a valid Ping IP address.", "Invalid IP", 
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                
+                _tempSettings.PingHost = pingHost;
             }
             _settingsService.SaveSettings(_tempSettings);
             Close();
