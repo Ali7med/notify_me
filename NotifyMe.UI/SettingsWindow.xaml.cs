@@ -23,13 +23,19 @@ namespace NotifyMe.UI
                 Opacity = current.Opacity, 
                 Theme = current.Theme,
                 IsTransparent = current.IsTransparent,
-                PingHost = current.PingHost
+                PingHost = current.PingHost,
+                UpdateIntervalSeconds = current.UpdateIntervalSeconds,
+                HighTrafficThresholdMBps = current.HighTrafficThresholdMBps,
+                EnableSoundNotifications = current.EnableSoundNotifications
             };
 
             // Initialize UI
             OpacitySlider.Value = _tempSettings.Opacity;
             ThemeComboBox.SelectedIndex = _tempSettings.Theme == "Glass" ? 0 : 1;
             PingHostTextBox.Text = _tempSettings.PingHost;
+            UpdateIntervalSlider.Value = _tempSettings.UpdateIntervalSeconds;
+            TrafficThresholdTextBox.Text = _tempSettings.HighTrafficThresholdMBps.ToString("F1");
+            SoundNotificationsCheckBox.IsChecked = _tempSettings.EnableSoundNotifications;
         }
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -66,6 +72,16 @@ namespace NotifyMe.UI
                 }
                 
                 _tempSettings.PingHost = pingHost;
+                
+                // Advanced settings
+                _tempSettings.UpdateIntervalSeconds = (int)UpdateIntervalSlider.Value;
+                
+                if (double.TryParse(TrafficThresholdTextBox.Text, out double threshold))
+                {
+                    _tempSettings.HighTrafficThresholdMBps = threshold;
+                }
+                
+                _tempSettings.EnableSoundNotifications = SoundNotificationsCheckBox.IsChecked ?? false;
             }
             _settingsService.SaveSettings(_tempSettings);
             Close();

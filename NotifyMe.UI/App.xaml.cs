@@ -14,7 +14,9 @@ public partial class App : Application
     private MainWindow? _mainWindow;
     private FloatingIconWindow? _floatingIcon;
     private SettingsWindow? _settingsWindow;
+    private HistoryWindow? _historyWindow;
     private SettingsService? _settingsService;
+    private DataLogger? _dataLogger;
     private readonly AppSettings _settings = new();
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -27,6 +29,17 @@ public partial class App : Application
         var pingWrapper = new PingWrapper();
         
         _settingsService = new SettingsService();
+        
+        // Initialize DataLogger with error handling
+        try
+        {
+            _dataLogger = new DataLogger();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to initialize DataLogger: {ex.Message}");
+            // Continue without logging - non-critical feature
+        }
 
         _notificationService = new NotificationService(_settings);
         _networkMonitor = new NetworkMonitor(networkInterfaceWrapper, pingWrapper) { CheckIntervalSeconds = _settings.CheckIntervalSeconds };
@@ -34,6 +47,7 @@ public partial class App : Application
 
         // Subscribe to events
         _networkMonitor.ConnectionStateChanged += OnConnectionStateChanged;
+        _networkMonitor.LatencyChanged += OnLatencyChanged;
         _trafficMonitor.TrafficUpdated += OnTrafficUpdated;
 
         // Start monitoring
@@ -69,7 +83,17 @@ public partial class App : Application
         Dispatcher.Invoke(() =>
         {
             UpdateTrayIcon(stats);
+            
+            // Log to database
+            var isConnected = _networkMonitor?.IsConnected ?? false;
+            _dataLogger?.LogNetworkStats(isConnected, stats.DownloadSpeedBytesPerSecond, stats.UploadSpeedBytesPerSecond, _lastLatency);
         });
+    }
+    
+    private long _lastLatency = -1;
+    private void OnLatencyChanged(object? sender, long latency)
+    {
+        _lastLatency = latency;
     }
 
     private void UpdateTrayIcon(NetworkStats? stats = null)
@@ -153,6 +177,32 @@ public partial class App : Application
     private void TaskbarIcon_DoubleClick(object sender, RoutedEventArgs e)
     {
         ShowMainWindow();
+    }
+    
+    private void ShowHistory_Click(object sender, RoutedEventArgs e)
+    {
+        ShowHistoryWindow();
+    }
+    
+    private void ShowHistoryWindow()
+    {
+        if (_historyWindow == null || !_historyWindow.IsLoaded)
+        {
+            if (_dataLogger != null)
+            {
+                _historyWindow = new HistoryWindow(_dataLogger);
+                _historyWindow.Show();
+            }
+            else
+            {
+                MessageBox.Show("Data logging is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        else
+        {
+            _historyWindow.WindowState = WindowState.Normal;
+            _historyWindow.Activate();
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 <Window x:Class="NotifyMe.UI.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="NotifyMe Settings" Height="450" Width="500"
+        Title="NotifyMe Settings" Height="650" Width="550"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -89,8 +89,9 @@
                         Click="CloseButton_Click" Margin="0,-5,-10,0"/>
             </Grid>
 
-            <!-- Content -->
-            <StackPanel Grid.Row="1" Margin="20,10">
+            <!-- Content with ScrollViewer -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="20,10">
+                <StackPanel>
                 <!-- Opacity Section -->
                 <TextBlock Text="Appearance" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource AccentColor}" Margin="0,0,0,10"/>
                 
@@ -120,8 +121,35 @@
                 <TextBlock Text="Ping IP Address" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,5"/>
                 <TextBox x:Name="PingHostTextBox" Height="35" Background="{StaticResource ControlBackground}" 
                          Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="10,8"
-                         VerticalContentAlignment="Center"/>
+                         VerticalContentAlignment="Center" Margin="0,0,0,20"/>
+
+                <!-- Advanced Section -->
+                <TextBlock Text="Advanced" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource AccentColor}" Margin="0,0,0,10"/>
+                
+                <!-- Update Interval -->
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Update Interval" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ElementName=UpdateIntervalSlider, Path=Value, StringFormat={}{0:F0} sec}" 
+                               Foreground="{StaticResource TextSecondary}" Grid.Column="1" VerticalAlignment="Center"/>
+                </Grid>
+                <Slider x:Name="UpdateIntervalSlider" Minimum="1" Maximum="10" Value="1" 
+                        TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,20"/>
+
+                <!-- Traffic Threshold -->
+                <TextBlock Text="High Traffic Threshold (MB/s)" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,5"/>
+                <TextBox x:Name="TrafficThresholdTextBox" Height="35" Background="{StaticResource ControlBackground}" 
+                         Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="10,8"
+                         VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+
+                <!-- Sound Notifications -->
+                <CheckBox x:Name="SoundNotificationsCheckBox" Content="Enable Sound Notifications" 
+                          Foreground="{StaticResource TextPrimary}" FontSize="12"/>
             </StackPanel>
+            </ScrollViewer>
 
             <!-- Footer -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">

@@ -33,7 +33,7 @@ namespace NotifyMe.UI
 
             _networkMonitor.LatencyChanged += OnLatencyChanged;
 
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(_settingsService.CurrentSettings.UpdateIntervalSeconds) };
             _timer.Tick += Timer_Tick;
             _timer.Start();
         }
@@ -54,6 +54,12 @@ namespace NotifyMe.UI
             }
             
             _networkMonitor.PingHost = settings.PingHost;
+            
+            // Update timer interval (only if timer is already initialized)
+            if (_timer != null)
+            {
+                _timer.Interval = TimeSpan.FromSeconds(settings.UpdateIntervalSeconds);
+            }
         }
 
         private void OnLatencyChanged(object? sender, long latency)

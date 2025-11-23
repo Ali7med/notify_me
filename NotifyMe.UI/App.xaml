@@ -64,6 +64,7 @@
                     <ContextMenu>
                         <MenuItem Header="Show Statistics" Click="ShowWindow_Click" FontWeight="Bold"/>
                         <MenuItem Header="Show Widget" Click="ShowWidget_Click"/>
+                        <MenuItem Header="View History" Click="ShowHistory_Click"/>
                         <MenuItem Header="Settings" Click="ShowSettings_Click"/>
                         <Separator/>
                         <MenuItem Header="Connection Status" IsEnabled="False"/>

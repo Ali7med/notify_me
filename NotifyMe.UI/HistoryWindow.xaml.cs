@@ -1,0 +1,121 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using NotifyMe.Core.Services;
+using NotifyMe.Models;
+
+namespace NotifyMe.UI
+{
+    public partial class HistoryWindow : Window
+    {
+        private readonly DataLogger _dataLogger;
+
+        public HistoryWindow(DataLogger dataLogger)
+        {
+            InitializeComponent();
+            _dataLogger = dataLogger;
+            LoadData();
+        }
+
+        private void LoadData()
+        {
+            try
+            {
+                var range = GetDateRange();
+                var logs = _dataLogger.GetLogs(range.from, range.to);
+                
+                // Convert to display models
+                var displayData = logs.Select(log => new NetworkLogDisplay
+                {
+                    Timestamp = log.Timestamp,
+                    StatusText = log.IsConnected ? "Connected" : "Disconnected",
+                    DownloadSpeedFormatted = FormatSpeed(log.DownloadSpeedBps),
+                    UploadSpeedFormatted = FormatSpeed(log.UploadSpeedBps),
+                    LatencyText = log.Latency < 0 ? "TIMEOUT" : $"{log.Latency}"
+                }).ToList();
+
+                HistoryDataGrid.ItemsSource = displayData;
+                RecordCountText.Text = $"{displayData.Count} records";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading history: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private (DateTime from, DateTime to) GetDateRange()
+        {
+            var to = DateTime.Now;
+            var from = to;
+
+            var selectedIndex = DateRangeComboBox.SelectedIndex;
+            switch (selectedIndex)
+            {
+                case 0: from = to.AddHours(-1); break;      // Last Hour
+                case 1: from = to.AddDays(-1); break;       // Last 24 Hours
+                case 2: from = to.AddDays(-7); break;       // Last 7 Days
+                case 3: from = to.AddDays(-30); break;      // Last 30 Days
+                case 4: from = DateTime.MinValue; break;    // All Time
+            }
+
+            return (from, to);
+        }
+
+        private string FormatSpeed(double bytesPerSecond)
+        {
+            if (bytesPerSecond < 1024) return $"{bytesPerSecond:F0} B/s";
+            if (bytesPerSecond < 1024 * 1024) return $"{bytesPerSecond / 1024.0:F1} KB/s";
+            return $"{bytesPerSecond / (1024.0 * 1024.0):F1} MB/s";
+        }
+
+        private void DateRangeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (HistoryDataGrid != null) // Check if initialized
+            {
+                LoadData();
+            }
+        }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadData();
+        }
+
+        private void ClearOldLogs_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to delete logs older than 30 days?", 
+                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            
+            if (result == MessageBoxResult.Yes)
+            {
+                _dataLogger.ClearOldLogs(30);
+                LoadData();
+                MessageBox.Show("Old logs cleared successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
+        }
+    }
+
+    // Display model for DataGrid
+    public class NetworkLogDisplay
+    {
+        public DateTime Timestamp { get; set; }
+        public string StatusText { get; set; } = "";
+        public string DownloadSpeedFormatted { get; set; } = "";
+        public string UploadSpeedFormatted { get; set; } = "";
+        public string LatencyText { get; set; } = "";
+    }
+}

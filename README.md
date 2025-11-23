@@ -1,38 +1,241 @@
-# NotifyMe
+# NotifyMe - Network Monitor
 
-A lightweight WPF network‑monitoring utility for Windows.
+<div align="center">
 
-## Features
-- System‑tray icon with real‑time network statistics.
-- **Double‑click tray icon** opens the main window (implemented via `TrayMouseDoubleClick`).
-- Configurable update intervals.
-- Built for .NET 10 (net10.0‑windows10.0.26100.0).
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet)
+![WPF](https://img.shields.io/badge/WPF-Windows-0078D4?style=for-the-badge&logo=windows)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite)
 
-## Prerequisites
-- Windows 10+ (build 17763 or later).
-- .NET SDK 10.0 installed.
+**تطبيق مراقبة شبكة احترافي في الوقت الفعلي**
 
-## Build & Run
+[الميزات](#-الميزات) • [التثبيت](#-التثبيت) • [الاستخدام](#-الاستخدام) • [الإعدادات](#-الإعدادات) • [التوثيق](#-التوثيق)
+
+</div>
+
+---
+
+## 📖 **نظرة عامة**
+
+**NotifyMe** هو تطبيق مراقبة شبكة متقدم مبني بـ .NET 10 و WPF، يوفر:
+- 📊 مراقبة في الوقت الفعلي لحالة الاتصال بالإنترنت
+- 🚀 قياس سرعات التحميل والرفع
+- 📡 قياس Ping latency
+- 💾 تسجيل تاريخي للبيانات في SQLite
+- 🎨 واجهة مستخدم احترافية بتصميم "Bank UI"
+
+---
+
+## ✨ **الميزات**
+
+### 🖥️ **أيقونة عائمة على سطح المكتب**
+- تصميم "Dynamic Pill" أفقي احترافي
+- عرض مباشر لسرعات التحميل والرفع
+- عرض Ping latency مع تلوين حسب السرعة:
+  - 🟢 أخضر: < 50ms
+  - 🟡 أصفر: 50-150ms
+  - 🔴 أحمر: > 150ms
+- تغيير اللون حسب حالة الاتصال
+- قابلة للسحب والتحريك
+- تأثيرات Hover وانيميشن
+
+### 🔔 **System Tray Integration**
+- أيقونة في شريط المهام
+- Tooltip ديناميكي يعرض حالة الاتصال
+- قائمة سياق شاملة:
+  - عرض الإحصائيات
+  - إظهار/إخفاء الأيقونة العائمة
+  - عرض السجل التاريخي
+  - الإعدادات
+  - الخروج
+
+### ⚙️ **إعدادات متقدمة**
+- **المظهر:**
+  - التحكم في الشفافية (10%-100%)
+  - اختيار Theme (Glass/Classic)
+- **الشبكة:**
+  - تخصيص Ping IP (افتراضي: 8.8.8.8)
+  - التحقق من صحة IP
+- **متقدم:**
+  - فترة التحديث: 1-10 ثواني
+  - حد استهلاك الشبكة العالي
+  - تفعيل الإشعارات الصوتية
+
+### 📊 **سجل البيانات التاريخية**
+- تسجيل تلقائي لجميع البيانات في SQLite
+- نافذة History احترافية مع:
+  - DataGrid منظم
+  - فلاتر زمنية (ساعة، يوم، أسبوع، شهر، الكل)
+  - تنسيق تلقائي للسرعات
+  - عرض TIMEOUT للأخطاء
+  - حذف السجلات القديمة (+30 يوم)
+
+---
+
+## 🚀 **التثبيت**
+
+### **المتطلبات:**
+- Windows 10/11
+- .NET 10.0 Runtime
+
+### **الخطوات:**
+
+1. **تحميل المشروع:**
 ```bash
-# From the solution root
-cd d:/Apps/C#/NofiyMe
+git clone https://github.com/Ali7med/notify_me.git
+cd notify_me
+```
+
+2. **البناء:**
+```bash
 dotnet build
+```
+
+3. **التشغيل:**
+```bash
 dotnet run --project NotifyMe.UI/NotifyMe.UI.csproj
 ```
 
-## Usage
-1. Launch the app – an icon appears in the system tray.
-2. **Double‑click** the tray icon to restore the main window.
-3. The tray tooltip shows current connection status and download/upload speeds.
+---
 
-## Project Structure
-- `NotifyMe.Core` – core services (network monitoring, ping, statistics).
-- `NotifyMe.UI` – WPF UI, tray icon, and window logic.
-- `NotifyMe.Models` – data models.
-- `NotifyMe.Tests` – unit tests.
+## 💡 **الاستخدام**
 
-## Contributing
-Feel free to open issues or submit pull requests. You can extend the double‑click handler to open settings, add notification sounds, or integrate other alert channels.
+### **بدء التشغيل:**
+1. شغّل التطبيق
+2. ستظهر الأيقونة العائمة في الزاوية السفلية اليمنى
+3. ستظهر أيقونة في System Tray
 
-## License
-MIT License – see `LICENSE` file.
+### **الأيقونة العائمة:**
+- **سحب**: اضغط واسحب لتحريك الأيقونة
+- **نقر مزدوج**: فتح النافذة الرئيسية
+- **نقر يمين**: قائمة الخيارات
+
+### **عرض السجل:**
+1. انقر بالزر الأيمن على أيقونة Tray
+2. اختر "View History"
+3. اختر النطاق الزمني من القائمة المنسدلة
+
+---
+
+## ⚙️ **الإعدادات**
+
+### **الوصول للإعدادات:**
+- نقر يمين على Tray Icon → Settings
+- أو من قائمة الأيقونة العائمة
+
+### **الإعدادات المتاحة:**
+
+| الإعداد | الوصف | القيمة الافتراضية |
+|--------|-------|-------------------|
+| Widget Opacity | شفافية الأيقونة العائمة | 80% |
+| Theme | نمط التصميم | Glass |
+| Ping IP Address | عنوان IP للـ Ping | 8.8.8.8 |
+| Update Interval | فترة التحديث | 1 ثانية |
+| High Traffic Threshold | حد الاستهلاك العالي | 5.0 MB/s |
+| Sound Notifications | الإشعارات الصوتية | معطل |
+
+---
+
+## 📁 **هيكل المشروع**
+
+```
+NotifyMe/
+├── NotifyMe.Models/          # نماذج البيانات
+├── NotifyMe.Core/            # المنطق الأساسي والخدمات
+├── NotifyMe.UI/              # واجهة المستخدم (WPF)
+├── NotifyMe.Tests/           # الاختبارات
+├── plan v1.md                # الخطة الأصلية
+├── PROGRESS.md               # سجل التقدم
+└── README.md                 # هذا الملف
+```
+
+---
+
+## 🛠️ **التقنيات المستخدمة**
+
+- **Framework**: .NET 10.0
+- **UI**: WPF (Windows Presentation Foundation)
+- **Database**: SQLite (Microsoft.Data.Sqlite)
+- **Tray Icon**: Hardcodet.Wpf.TaskbarNotification
+- **Network**: System.Net.NetworkInformation
+
+---
+
+## 📊 **قاعدة البيانات**
+
+### **الموقع:**
+```
+%LocalAppData%\NotifyMe\network_logs.db
+```
+
+### **الجدول: NetworkLogs**
+| الحقل | النوع | الوصف |
+|------|------|-------|
+| Id | INTEGER | المعرف الفريد |
+| Timestamp | TEXT | التاريخ والوقت |
+| IsConnected | INTEGER | حالة الاتصال (0/1) |
+| DownloadSpeedBps | REAL | سرعة التحميل (بايت/ثانية) |
+| UploadSpeedBps | REAL | سرعة الرفع (بايت/ثانية) |
+| Latency | INTEGER | زمن الاستجابة (ms) |
+
+---
+
+## 🎨 **التصميم**
+
+### **الألوان:**
+- **Primary Background**: #1E1E1E
+- **Secondary Background**: #2D2D2D
+- **Accent Color**: #4CC2FF (أزرق سماوي)
+- **Text Primary**: #FFFFFF
+- **Text Secondary**: #AAAAAA
+
+### **الخطوط:**
+- Segoe UI Variable Display
+- Segoe UI (fallback)
+
+---
+
+## 🔮 **الميزات القادمة**
+
+- [ ] **المرحلة 5**: الإشعارات الصوتية
+- [ ] **المرحلة 6**: وضع Do Not Disturb
+- [ ] **المرحلة 7**: دعم تعدد اللغات (عربي/إنجليزي)
+- [ ] **المرحلة 8**: تحسينات الأداء
+
+راجع [plan v1.md](plan%20v1.md) للتفاصيل الكاملة.
+
+---
+
+## 📝 **التوثيق**
+
+- **[plan v1.md](plan%20v1.md)** - الخطة الأصلية والمراحل
+- **[PROGRESS.md](PROGRESS.md)** - سجل التقدم والإنجازات التفصيلي
+- **[task.md](.gemini/task.md)** - قائمة المهام (للمطورين)
+
+---
+
+## 🐛 **الإبلاغ عن المشاكل**
+
+إذا واجهت أي مشكلة:
+1. تحقق من [PROGRESS.md](PROGRESS.md) للإصلاحات المعروفة
+2. افتح Issue جديد على GitHub
+3. قدم تفاصيل كاملة عن المشكلة
+
+---
+
+## 📄 **الترخيص**
+
+هذا المشروع مفتوح المصدر.
+
+---
+
+## 👨‍💻 **المطور**
+
+تم تطوير هذا المشروع بواسطة **Ali7med**
+
+---
+
+<div align="center">
+
+**⭐ إذا أعجبك المشروع، لا تنسى إضافة نجمة! ⭐**
+
+</div>
