@@ -14,9 +14,11 @@ public class NetworkMonitor
 
     public event EventHandler<ConnectionEvent>? ConnectionStateChanged;
     public event EventHandler<NetworkStats>? StatsUpdated;
+    public event EventHandler<long>? LatencyChanged;
 
     public bool IsConnected { get; private set; } = true;
     public int CheckIntervalSeconds { get; set; } = 5;
+    public string PingHost { get; set; } = "8.8.8.8";
 
     public NetworkMonitor(INetworkInterfaceWrapper networkInterfaceWrapper, IPingWrapper pingWrapper)
     {
@@ -57,6 +59,24 @@ public class NetworkMonitor
 
             var results = await Task.WhenAll(pingTasks);
             bool isConnected = results.Any(r => r);
+
+            // Measure latency to the configured PingHost
+            if (isConnected)
+            {
+                try
+                {
+                    using var ping = new Ping();
+                    var reply = await ping.SendPingAsync(PingHost, 3000);
+                    if (reply.Status == IPStatus.Success)
+                    {
+                        LatencyChanged?.Invoke(this, reply.RoundtripTime);
+                    }
+                }
+                catch
+                {
+                    // Ignore ping errors for latency check
+                }
+            }
 
             UpdateConnectionState(isConnected);
             return isConnected;

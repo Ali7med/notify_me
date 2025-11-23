@@ -6,24 +6,73 @@
              Startup="Application_Startup"
              Exit="Application_Exit">
     <Application.Resources>
-        <!-- System Tray Icon -->
-        <tb:TaskbarIcon x:Key="NotifyIcon"
-                        IconSource="/Resources/icon.ico"
-                        ToolTipText="NotifyMe - Network Monitor"
-                        TrayMouseDoubleClick="TaskbarIcon_DoubleClick"
-                        MenuActivation="RightClick">
-            <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Show Statistics" Click="ShowWindow_Click" FontWeight="Bold"/>
-                    <MenuItem Header="Show Widget" Click="ShowWidget_Click"/>
-                    <MenuItem Header="Settings" Click="ShowSettings_Click"/>
-                    <Separator/>
-                    <MenuItem Header="Connection Status" IsEnabled="False"/>
-                    <MenuItem Header="Traffic Monitor" IsEnabled="False"/>
-                    <Separator/>
-                    <MenuItem Header="Exit" Click="Exit_Click"/>
-                </ContextMenu>
-            </tb:TaskbarIcon.ContextMenu>
-        </tb:TaskbarIcon>
+        <ResourceDictionary>
+            <!-- Context Menu Style -->
+            <Style TargetType="{x:Type ContextMenu}">
+                <Setter Property="Background" Value="#1E1E1E"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="#333333"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ContextMenu}">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    CornerRadius="5">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.5"/>
+                                </Border.Effect>
+                                <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="2"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type MenuItem}">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type MenuItem}">
+                            <Border x:Name="Border" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter Content="{TemplateBinding Header}" 
+                                                  VerticalAlignment="Center" 
+                                                  HorizontalAlignment="Left"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="#4CC2FF"/>
+                                    <Setter Property="Foreground" Value="#1E1E1E"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- System Tray Icon -->
+            <tb:TaskbarIcon x:Key="NotifyIcon"
+                            IconSource="/Resources/icon.ico"
+                            ToolTipText="NotifyMe - Network Monitor"
+                            TrayMouseDoubleClick="TaskbarIcon_DoubleClick"
+                            MenuActivation="RightClick">
+                <tb:TaskbarIcon.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Show Statistics" Click="ShowWindow_Click" FontWeight="Bold"/>
+                        <MenuItem Header="Show Widget" Click="ShowWidget_Click"/>
+                        <MenuItem Header="Settings" Click="ShowSettings_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Connection Status" IsEnabled="False"/>
+                        <MenuItem Header="Traffic Monitor" IsEnabled="False"/>
+                        <Separator/>
+                        <MenuItem Header="Exit" Click="Exit_Click"/>
+                    </ContextMenu>
+                </tb:TaskbarIcon.ContextMenu>
+            </tb:TaskbarIcon>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

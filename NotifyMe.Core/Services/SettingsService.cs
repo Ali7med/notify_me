@@ -41,18 +41,19 @@ public class SettingsService
         return new UserSettings();
     }
 
-    public void SaveSettings(UserSettings settings)
-    {
-        try
+        public void SaveSettings(UserSettings settings)
         {
-            _currentSettings = settings;
-            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_filePath, json);
-            SettingsChanged?.Invoke(this, _currentSettings);
+            try
+            {
+                _currentSettings = settings;
+                var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(_filePath, json);
+                SettingsChanged?.Invoke(this, _currentSettings);
+                System.Diagnostics.Debug.WriteLine($"Settings saved to {_filePath}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving settings: {ex.Message}");
+            }
         }
-        catch
-        {
-            // Handle save error
-        }
-    }
 }

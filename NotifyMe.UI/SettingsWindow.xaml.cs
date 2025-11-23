@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
 
@@ -21,12 +22,14 @@ namespace NotifyMe.UI
             { 
                 Opacity = current.Opacity, 
                 Theme = current.Theme,
-                IsTransparent = current.IsTransparent
+                IsTransparent = current.IsTransparent,
+                PingHost = current.PingHost
             };
 
             // Initialize UI
             OpacitySlider.Value = _tempSettings.Opacity;
             ThemeComboBox.SelectedIndex = _tempSettings.Theme == "Glass" ? 0 : 1;
+            PingHostTextBox.Text = _tempSettings.PingHost;
         }
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -34,7 +37,7 @@ namespace NotifyMe.UI
             if (_tempSettings != null)
             {
                 _tempSettings.Opacity = e.NewValue;
-                // Live preview (optional, requires binding in FloatingIconWindow)
+                // Live preview: Save immediately to trigger event
                 _settingsService.SaveSettings(_tempSettings); 
             }
         }
@@ -50,8 +53,23 @@ namespace NotifyMe.UI
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_tempSettings != null)
+            {
+                _tempSettings.PingHost = PingHostTextBox.Text;
+            }
             _settingsService.SaveSettings(_tempSettings);
             Close();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
         }
     }
 }

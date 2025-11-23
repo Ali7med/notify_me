@@ -31,6 +31,8 @@ namespace NotifyMe.UI
             ApplySettings(_settingsService.CurrentSettings);
             _settingsService.SettingsChanged += (s, settings) => Dispatcher.Invoke(() => ApplySettings(settings));
 
+            _networkMonitor.LatencyChanged += OnLatencyChanged;
+
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += Timer_Tick;
             _timer.Start();
@@ -38,26 +40,33 @@ namespace NotifyMe.UI
 
         private void ApplySettings(UserSettings settings)
         {
-            // Ensure we are on the UI thread
             if (!Dispatcher.CheckAccess())
             {
                 Dispatcher.Invoke(() => ApplySettings(settings));
                 return;
             }
 
-            Opacity = settings.Opacity;
+            if (MainBorder.Background is SolidColorBrush brush)
+            {
+                // Create a new brush to avoid freezing issues if it's frozen
+                var newBrush = new SolidColorBrush(brush.Color) { Opacity = settings.Opacity };
+                MainBorder.Background = newBrush;
+            }
             
-            // Apply Theme
-            if (settings.Theme == "Glass")
+            _networkMonitor.PingHost = settings.PingHost;
+        }
+
+        private void OnLatencyChanged(object? sender, long latency)
+        {
+            Dispatcher.Invoke(() =>
             {
-                // Re-apply glass effect if needed (already default)
-                MainBorder.Background = new SolidColorBrush(Color.FromArgb((byte)(255 * 0.85), 30, 30, 30)); // #1E1E1E with 0.85 opacity
-            }
-            else
-            {
-                // Classic Theme (Solid)
-                MainBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)); // #1E1E1E Solid
-            }
+                PingText.Text = $"{latency} ms";
+                
+                // Color code latency
+                if (latency < 50) PingText.Foreground = new SolidColorBrush(Color.FromRgb(76, 255, 76)); // Green
+                else if (latency < 150) PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 215, 0)); // Yellow
+                else PingText.Foreground = new SolidColorBrush(Color.FromRgb(255, 76, 76)); // Red
+            });
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -65,57 +74,50 @@ namespace NotifyMe.UI
             bool isConnected = _networkMonitor?.IsConnected ?? false;
             NetworkStats? stats = _trafficMonitor?.CurrentStats;
 
-            Color startColor, endColor;
-
             if (!isConnected)
             {
-                // Red gradient for disconnected
-                startColor = Colors.Red;
-                endColor = Colors.DarkRed;
+                // Disconnected State: Red
+                SetStatusColor(Colors.Red);
                 DownloadText.Text = "--";
                 UploadText.Text = "--";
-                DownloadText.Foreground = new SolidColorBrush(Colors.Red);
-                UploadText.Foreground = new SolidColorBrush(Colors.Red);
             }
             else
             {
-                // Check for traffic (threshold > 0 bytes)
+                // Connected State
                 bool hasTraffic = stats != null && (stats.DownloadSpeedBytesPerSecond > 0 || stats.UploadSpeedBytesPerSecond > 0);
                 
                 if (hasTraffic)
                 {
-                    // Green/Blue gradient for activity
-                    startColor = Color.FromRgb(76, 194, 255); // #4CC2FF (Light Blue)
-                    endColor = Color.FromRgb(255, 215, 0);    // #FFD700 (Gold)
+                    // Active Traffic: Blue/Green
+                    SetStatusColor(Color.FromRgb(76, 194, 255)); // #4CC2FF
                 }
                 else
                 {
-                    // Gray gradient for idle
-                    startColor = Colors.Gray;
-                    endColor = Colors.DarkGray;
+                    // Idle: Gray
+                    SetStatusColor(Colors.Gray);
                 }
 
                 if (stats != null)
                 {
-                    DownloadText.Text = $"↓ {FormatSpeed(stats.DownloadSpeedBytesPerSecond)}";
-                    UploadText.Text = $"↑ {FormatSpeed(stats.UploadSpeedBytesPerSecond)}";
-                    DownloadText.Foreground = new SolidColorBrush(Color.FromRgb(76, 194, 255));
-                    UploadText.Foreground = new SolidColorBrush(Color.FromRgb(255, 215, 0));
+                    DownloadText.Text = $"{FormatSpeed(stats.DownloadSpeedBytesPerSecond)}";
+                    UploadText.Text = $"{FormatSpeed(stats.UploadSpeedBytesPerSecond)}";
                 }
             }
-
-            AnimateGradient(startColor, endColor);
         }
 
-        private void AnimateGradient(Color toStartColor, Color toEndColor)
+        private void SetStatusColor(Color color)
         {
-            var duration = TimeSpan.FromMilliseconds(500);
-
-            var startAnimation = new ColorAnimation(toStartColor, duration);
-            var endAnimation = new ColorAnimation(toEndColor, duration);
-
-            BorderGradient.GradientStops[0].BeginAnimation(GradientStop.ColorProperty, startAnimation);
-            BorderGradient.GradientStops[1].BeginAnimation(GradientStop.ColorProperty, endAnimation);
+            var brush = new SolidColorBrush(color);
+            StatusBar.Background = brush;
+            StatusBar.Effect = new System.Windows.Media.Effects.DropShadowEffect 
+            { 
+                Color = color, 
+                BlurRadius = 8, 
+                ShadowDepth = 0, 
+                Opacity = 0.6 
+            };
+            
+            BorderBrush.Color = color;
         }
 
         private string FormatSpeed(double bytesPerSecond)
@@ -133,6 +135,24 @@ namespace NotifyMe.UI
         private void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             _openAppAction?.Invoke();
+        }
+
+        private void Window_MouseEnter(object sender, MouseEventArgs e)
+        {
+            // Hover Effect: Scale Up slightly
+            var anim = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(200));
+            MainBorder.RenderTransform = new ScaleTransform(1, 1);
+            MainBorder.RenderTransformOrigin = new Point(0.5, 0.5);
+            MainBorder.RenderTransform.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+            MainBorder.RenderTransform.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+        }
+
+        private void Window_MouseLeave(object sender, MouseEventArgs e)
+        {
+            // Restore Scale
+            var anim = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(200));
+            MainBorder.RenderTransform.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+            MainBorder.RenderTransform.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
         }
 
         private void MenuItem_Open_Click(object sender, RoutedEventArgs e)
