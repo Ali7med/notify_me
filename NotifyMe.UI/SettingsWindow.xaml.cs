@@ -9,12 +9,14 @@ namespace NotifyMe.UI
     public partial class SettingsWindow : Window
     {
         private readonly SettingsService _settingsService;
+        private readonly AutoStartService _autoStartService;
         private UserSettings _tempSettings;
 
-        public SettingsWindow(SettingsService settingsService)
+        public SettingsWindow(SettingsService settingsService, AutoStartService autoStartService)
         {
             InitializeComponent();
             _settingsService = settingsService;
+            _autoStartService = autoStartService;
             
             // Clone current settings for temporary editing
             var current = _settingsService.CurrentSettings;
@@ -26,8 +28,13 @@ namespace NotifyMe.UI
                 PingHost = current.PingHost,
                 UpdateIntervalSeconds = current.UpdateIntervalSeconds,
                 HighTrafficThresholdMBps = current.HighTrafficThresholdMBps,
+                HighTrafficThresholdUnit = current.HighTrafficThresholdUnit,
                 EnableSoundNotifications = current.EnableSoundNotifications,
-                EnableToastNotifications = current.EnableToastNotifications
+
+                EnableToastNotifications = current.EnableToastNotifications,
+                StartWithWindows = current.StartWithWindows,
+                NotificationType = current.NotificationType,
+                CustomNotificationPosition = current.CustomNotificationPosition
             };
 
             // Initialize UI
@@ -36,8 +43,38 @@ namespace NotifyMe.UI
             PingHostTextBox.Text = _tempSettings.PingHost;
             UpdateIntervalSlider.Value = _tempSettings.UpdateIntervalSeconds;
             TrafficThresholdTextBox.Text = _tempSettings.HighTrafficThresholdMBps.ToString("F1");
+            TrafficUnitComboBox.SelectedIndex = _tempSettings.HighTrafficThresholdUnit switch
+            {
+                "KB" => 0,
+                "MB" => 1,
+                "GB" => 2,
+                _ => 1
+            };
             ToastNotificationsCheckBox.IsChecked = _tempSettings.EnableToastNotifications;
             SoundNotificationsCheckBox.IsChecked = _tempSettings.EnableSoundNotifications;
+            AutoStartCheckBox.IsChecked = _tempSettings.StartWithWindows;
+            
+            // Initialize Notification Type
+            if (_tempSettings.NotificationType == "Custom")
+            {
+                CustomNotificationRadio.IsChecked = true;
+                CustomPositionPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                ToastNotificationRadio.IsChecked = true;
+                CustomPositionPanel.Visibility = Visibility.Collapsed;
+            }
+            
+            // Initialize Position
+            foreach (ComboBoxItem item in NotificationPositionComboBox.Items)
+            {
+                if (item.Tag?.ToString() == _tempSettings.CustomNotificationPosition)
+                {
+                    item.IsSelected = true;
+                    break;
+                }
+            }
         }
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -83,8 +120,44 @@ namespace NotifyMe.UI
                     _tempSettings.HighTrafficThresholdMBps = threshold;
                 }
                 
+                // Traffic threshold unit
+                _tempSettings.HighTrafficThresholdUnit = TrafficUnitComboBox.SelectedIndex switch
+                {
+                    0 => "KB",
+                    1 => "MB",
+                    2 => "GB",
+                    _ => "MB"
+                };
+                
                 _tempSettings.EnableToastNotifications = ToastNotificationsCheckBox.IsChecked ?? true;
                 _tempSettings.EnableSoundNotifications = SoundNotificationsCheckBox.IsChecked ?? true;
+                
+                // Notification Type & Position
+                _tempSettings.NotificationType = CustomNotificationRadio.IsChecked == true ? "Custom" : "Toast";
+                
+                if (NotificationPositionComboBox.SelectedItem is ComboBoxItem selectedPosition)
+                {
+                    _tempSettings.CustomNotificationPosition = selectedPosition.Tag?.ToString() ?? "TopRight";
+                }
+
+                // Auto-Start handling
+                var startWithWindows = AutoStartCheckBox.IsChecked ?? false;
+                _tempSettings.StartWithWindows = startWithWindows;
+                
+                // Apply auto-start setting to registry
+                if (startWithWindows)
+                {
+                    if (!_autoStartService.Enable())
+                    {
+                        MessageBox.Show("Failed to enable auto-start. Please check your permissions.", 
+                            "Auto-Start Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        _tempSettings.StartWithWindows = false; // Revert on failure
+                    }
+                }
+                else
+                {
+                    _autoStartService.Disable();
+                }
             }
                 _settingsService.SaveSettings(_tempSettings);
             Close();
@@ -107,6 +180,18 @@ namespace NotifyMe.UI
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
+        }
+
+        private void CustomNotificationRadio_Checked(object sender, RoutedEventArgs e)
+        {
+            if (CustomPositionPanel != null)
+                CustomPositionPanel.Visibility = Visibility.Visible;
+        }
+
+        private void ToastNotificationRadio_Checked(object sender, RoutedEventArgs e)
+        {
+            if (CustomPositionPanel != null)
+                CustomPositionPanel.Visibility = Visibility.Collapsed;
         }
     }
 }

@@ -10,6 +10,12 @@ public class UserSettings
     // Advanced Settings
     public int UpdateIntervalSeconds { get; set; } = 1;
     public double HighTrafficThresholdMBps { get; set; } = 5.0;
+    public string HighTrafficThresholdUnit { get; set; } = "MB"; // KB, MB, GB
     public bool EnableSoundNotifications { get; set; } = true;
     public bool EnableToastNotifications { get; set; } = true;
+    public bool StartWithWindows { get; set; } = false;
+    
+    // Notification Settings
+    public string NotificationType { get; set; } = "Toast"; // "Toast" or "Custom"
+    public string CustomNotificationPosition { get; set; } = "TopRight"; // TopRight, TopLeft, BottomRight, BottomLeft
 }

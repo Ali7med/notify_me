@@ -135,6 +135,79 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource ControlBackground}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" Padding="12,10">
+                            <Grid>
+                                <ContentPresenter Content="{TemplateBinding SelectionBoxItem}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Left"/>
+                                <ToggleButton Name="ToggleButton" Focusable="False"
+                                            IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ClickMode="Press"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <TextBlock Text="▼" Foreground="{StaticResource TextSecondary}" 
+                                                          HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                                          Margin="0,0,10,0" FontSize="10"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                                <Popup Name="Popup" Placement="Bottom" Focusable="False" AllowsTransparency="True"
+                                       IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Slide">
+                                    <Border Background="{StaticResource ControlBackground}" 
+                                            BorderBrush="{StaticResource AccentColor}" BorderThickness="1" 
+                                            CornerRadius="6" MaxHeight="200">
+                                        <ScrollViewer>
+                                            <ItemsPresenter/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ComboBoxItem Style -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border Name="Border" Background="{TemplateBinding Background}" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#3A3A3A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackground}" CornerRadius="12" 
@@ -243,6 +316,40 @@
                             <TextBlock Text="Alert Preferences" FontSize="14" FontWeight="SemiBold" 
                                       Foreground="{StaticResource TextPrimary}" Margin="0,0,0,15"/>
 
+                            <!-- Notification Type -->
+                            <TextBlock Text="Notification Type" FontSize="14" FontWeight="SemiBold" 
+                                      Foreground="{StaticResource TextPrimary}" Margin="0,0,0,10"/>
+                            <Border Background="{StaticResource ControlBackground}" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <RadioButton x:Name="ToastNotificationRadio" Content="🪟 Windows Toast Notifications" 
+                                                Foreground="{StaticResource TextPrimary}" FontSize="13" Margin="0,0,0,8" 
+                                                IsChecked="True" GroupName="NotificationType" Checked="ToastNotificationRadio_Checked"/>
+                                    <TextBlock Text="Use built-in Windows notifications (shows in Action Center)" 
+                                              Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="30,0,0,15"/>
+                                    
+                                    <RadioButton x:Name="CustomNotificationRadio" Content="✨ Custom Notifications" 
+                                                Foreground="{StaticResource TextPrimary}" FontSize="13" Margin="0,0,0,8"
+                                                GroupName="NotificationType" Checked="CustomNotificationRadio_Checked"/>
+                                    <TextBlock Text="Use custom notification window with configurable position" 
+                                              Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="30,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Custom Notification Position (only visible when Custom is selected) -->
+                            <Border x:Name="CustomPositionPanel" Visibility="Collapsed" 
+                                   Background="{StaticResource ControlBackground}" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <TextBlock Text="Notification Position" FontSize="13" FontWeight="SemiBold" 
+                                              Foreground="{StaticResource TextPrimary}" Margin="0,0,0,10"/>
+                                    <ComboBox x:Name="NotificationPositionComboBox" Height="40" FontSize="13">
+                                        <ComboBoxItem Content="⬈ Top Right" Tag="TopRight" IsSelected="True"/>
+                                        <ComboBoxItem Content="⬉ Top Left" Tag="TopLeft"/>
+                                        <ComboBoxItem Content="⬊ Bottom Right" Tag="BottomRight"/>
+                                        <ComboBoxItem Content="⬋ Bottom Left" Tag="BottomLeft"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Border>
+
                             <!-- Toast Notifications -->
                             <Border Background="{StaticResource ControlBackground}" 
                                    CornerRadius="8" Padding="15" Margin="0,0,0,15">
@@ -307,19 +414,36 @@
                                       Foreground="{StaticResource TextPrimary}" Margin="0,0,0,10"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox x:Name="TrafficThresholdTextBox" Height="40" 
                                         Background="{StaticResource ControlBackground}" 
                                         Foreground="{StaticResource TextPrimary}" 
                                         BorderThickness="1" BorderBrush="{StaticResource BorderColor}"
                                         Padding="12,10" VerticalContentAlignment="Center" FontSize="13"/>
-                                <TextBlock Text="MB/s" Grid.Column="1" Margin="10,0,0,0" 
-                                          Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="TrafficUnitComboBox" Grid.Column="1" Height="40" 
+                                         Margin="10,0,0,0" FontSize="13">
+                                    <ComboBoxItem Content="KB/s"/>
+                                    <ComboBoxItem Content="MB/s" IsSelected="True"/>
+                                    <ComboBoxItem Content="GB/s"/>
+                                </ComboBox>
                             </Grid>
-                            <TextBlock Text="Threshold for considering traffic as 'high' (affects visual indicators)" 
-                                      Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,8,0,0"/>
+                            <TextBlock Text="Threshold for considering traffic as 'high' (shows alert when exceeded)" 
+                                      Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,8,0,25"/>
+
+                            <!-- Auto-Start -->
+                            <TextBlock Text="Startup Behavior" FontSize="14" FontWeight="SemiBold" 
+                                      Foreground="{StaticResource TextPrimary}" Margin="0,0,0,10"/>
+                            <Border Background="{StaticResource ControlBackground}" 
+                                   CornerRadius="8" Padding="15" Margin="0,0,0,0">
+                                <StackPanel>
+                                    <CheckBox x:Name="AutoStartCheckBox" 
+                                             Content="🚀 Start with Windows" FontSize="13" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Automatically launch NotifyMe when Windows starts" 
+                                              Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="30,0,0,0"/>
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>

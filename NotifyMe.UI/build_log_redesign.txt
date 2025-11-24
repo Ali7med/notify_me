@@ -1,0 +1,13 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  NotifyMe.Models -> D:\Apps\C#\NofiyMe\NotifyMe.Models\bin\Debug\net8.0\NotifyMe.Models.dll
+  NotifyMe.Core -> D:\Apps\C#\NofiyMe\NotifyMe.Core\bin\Debug\net8.0-windows10.0.19041.0\NotifyMe.Core.dll
+D:\Apps\C#\NofiyMe\NotifyMe.UI\Windows\CustomNotificationWindow.xaml(61,41): error MC4111: Cannot find the Trigger target 'CloseText'.  (The target must appear before any Setters, Triggers, or Conditions that use it.) Line 61 Position 41. [D:\Apps\C#\NofiyMe\NotifyMe.UI\NotifyMe.UI.csproj]
+
+Build FAILED.
+
+D:\Apps\C#\NofiyMe\NotifyMe.UI\Windows\CustomNotificationWindow.xaml(61,41): error MC4111: Cannot find the Trigger target 'CloseText'.  (The target must appear before any Setters, Triggers, or Conditions that use it.) Line 61 Position 41. [D:\Apps\C#\NofiyMe\NotifyMe.UI\NotifyMe.UI.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.49

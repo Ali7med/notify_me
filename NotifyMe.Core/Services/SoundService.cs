@@ -14,9 +14,30 @@ public class SoundService
     {
         _soundPlayer = new SoundPlayer();
         
-        // Get path to Resources/Sounds folder
+        // Try to find Resources/Sounds folder
         var appPath = AppDomain.CurrentDomain.BaseDirectory;
-        _soundsPath = Path.Combine(appPath, "Resources", "Sounds");
+        var possiblePaths = new[]
+        {
+            Path.Combine(appPath, "Resources", "Sounds"),
+            Path.Combine(appPath, "..", "..", "..", "Resources", "Sounds"),
+            Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Sounds"),
+        };
+        
+        foreach (var path in possiblePaths)
+        {
+            if (Directory.Exists(path))
+            {
+                _soundsPath = Path.GetFullPath(path);
+                System.Diagnostics.Debug.WriteLine($"Sound path found: {_soundsPath}");
+                break;
+            }
+        }
+        
+        if (string.IsNullOrEmpty(_soundsPath))
+        {
+            _soundsPath = Path.Combine(appPath, "Resources", "Sounds");
+            System.Diagnostics.Debug.WriteLine($"Sound path not found, using default: {_soundsPath}");
+        }
     }
 
     public bool IsEnabled
@@ -27,15 +48,27 @@ public class SoundService
 
     public void PlayConnectionLost()
     {
-        if (!_isEnabled) return;
+        if (!_isEnabled)
+        {
+            System.Diagnostics.Debug.WriteLine("Sound is disabled");
+            return;
+        }
 
         try
         {
             var soundFile = Path.Combine(_soundsPath, "disconnect.wav");
+            System.Diagnostics.Debug.WriteLine($"Attempting to play: {soundFile}");
+            System.Diagnostics.Debug.WriteLine($"File exists: {File.Exists(soundFile)}");
+            
             if (File.Exists(soundFile))
             {
                 _soundPlayer.SoundLocation = soundFile;
                 _soundPlayer.Play();
+                System.Diagnostics.Debug.WriteLine("Sound played successfully");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Sound file not found: {soundFile}");
             }
         }
         catch (Exception ex)
@@ -46,15 +79,27 @@ public class SoundService
 
     public void PlayConnectionRestored()
     {
-        if (!_isEnabled) return;
+        if (!_isEnabled)
+        {
+            System.Diagnostics.Debug.WriteLine("Sound is disabled");
+            return;
+        }
 
         try
         {
             var soundFile = Path.Combine(_soundsPath, "reconnect.wav");
+            System.Diagnostics.Debug.WriteLine($"Attempting to play: {soundFile}");
+            System.Diagnostics.Debug.WriteLine($"File exists: {File.Exists(soundFile)}");
+            
             if (File.Exists(soundFile))
             {
                 _soundPlayer.SoundLocation = soundFile;
                 _soundPlayer.Play();
+                System.Diagnostics.Debug.WriteLine("Sound played successfully");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Sound file not found: {soundFile}");
             }
         }
         catch (Exception ex)

@@ -18,6 +18,7 @@ public partial class App : Application
     private HistoryWindow? _historyWindow;
     private SettingsService? _settingsService;
     private SoundService? _soundService;
+    private AutoStartService? _autoStartService;
     private DataLogger? _dataLogger;
     private readonly AppSettings _settings = new();
 
@@ -32,6 +33,16 @@ public partial class App : Application
         
         _settingsService = new SettingsService();
         _soundService = new SoundService();
+        _autoStartService = new AutoStartService();
+        
+        // Sync auto-start setting with registry state
+        var currentSettings = _settingsService.CurrentSettings;
+        var actualState = _autoStartService.IsEnabled();
+        if (currentSettings.StartWithWindows != actualState)
+        {
+            currentSettings.StartWithWindows = actualState;
+            _settingsService.SaveSettings(currentSettings);
+        }
         
         // Initialize DataLogger with error handling
         try
@@ -89,7 +100,10 @@ public partial class App : Application
             UpdateTrayIcon();
         });
     }
-
+    
+    private long _lastLatency = -1;
+    private DateTime _lastHighTrafficAlert = DateTime.MinValue;
+    
     private void OnTrafficUpdated(object? sender, NetworkStats stats)
     {
         Dispatcher.Invoke(() =>
@@ -99,10 +113,58 @@ public partial class App : Application
             // Log to database
             var isConnected = _networkMonitor?.IsConnected ?? false;
             _dataLogger?.LogNetworkStats(isConnected, stats.DownloadSpeedBytesPerSecond, stats.UploadSpeedBytesPerSecond, _lastLatency);
+            
+            // Check for high traffic alert
+            CheckHighTrafficAlert(stats);
         });
     }
     
-    private long _lastLatency = -1;
+    private void CheckHighTrafficAlert(NetworkStats stats)
+    {
+        var settings = _settingsService?.CurrentSettings;
+        if (settings == null)
+        {
+            System.Diagnostics.Debug.WriteLine("Settings is null");
+            return;
+        }
+        
+        // Convert download speed from Bytes/s to MB/s
+        double speedMBps = stats.DownloadSpeedBytesPerSecond / (1024.0 * 1024.0);
+        
+        // Convert threshold to MB/s based on unit
+        double thresholdMBps = settings.HighTrafficThresholdUnit?.ToUpper() switch
+        {
+            "KB" => settings.HighTrafficThresholdMBps / 1024.0,
+            "GB" => settings.HighTrafficThresholdMBps * 1024.0,
+            _ => settings.HighTrafficThresholdMBps
+        };
+        
+        System.Diagnostics.Debug.WriteLine($"Traffic Check - Speed: {speedMBps:F2} MB/s, Threshold: {thresholdMBps:F2} MB/s ({settings.HighTrafficThresholdMBps} {settings.HighTrafficThresholdUnit})");
+        
+        // Check if threshold exceeded (with throttling - only notify once per 5 minutes)
+        if (speedMBps > thresholdMBps)
+        {
+            var now = DateTime.Now;
+            var timeSinceLastAlert = (now - _lastHighTrafficAlert).TotalMinutes;
+            System.Diagnostics.Debug.WriteLine($"THRESHOLD EXCEEDED! Time since last alert: {timeSinceLastAlert:F1} minutes");
+            
+            if (timeSinceLastAlert >= 5)
+            {
+                System.Diagnostics.Debug.WriteLine("Showing high traffic alert...");
+                _notificationService?.ShowHighTrafficAlert(
+                    speedMBps,
+                    settings.HighTrafficThresholdUnit ?? "MB",
+                    settings.HighTrafficThresholdMBps
+                );
+                _lastHighTrafficAlert = now;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Skipping alert (throttled) - wait {5 - timeSinceLastAlert:F1} more minutes");
+            }
+        }
+    }
+    
     private void OnLatencyChanged(object? sender, long latency)
     {
         _lastLatency = latency;
@@ -154,7 +216,7 @@ public partial class App : Application
     {
         if (_settingsWindow == null)
         {
-            _settingsWindow = new SettingsWindow(_settingsService!);
+            _settingsWindow = new SettingsWindow(_settingsService!, _autoStartService!);
             _settingsWindow.Closed += (s, e) => _settingsWindow = null;
         }
         _settingsWindow.Show();

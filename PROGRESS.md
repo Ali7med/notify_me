@@ -321,9 +321,82 @@ NotifyMe/
 
 ---
 
+### **المرحلة 8: البدء التلقائي مع Windows** ✅ (مكتمل 100%)
+**التاريخ**: 24 نوفمبر 2025
+
+#### الميزات المنفذة:
+
+##### **AutoStartService:**
+- ✅ إدارة Windows Registry (HKEY_CURRENT_USER)
+- ✅ `IsEnabled()` - التحقق من حالة Auto-Start
+- ✅ `Enable()` - تفعيل البدء التلقائي
+- ✅ `Disable()` - تعطيل البدء التلقائي
+- ✅ معالجة أخطاء شاملة
+
+##### **واجهة المستخدم:**
+- ✅ CheckBox في تبويب Advanced: "🚀 Start with Windows"
+- ✅ نص توضيحي: "Automatically launch NotifyMe when Windows starts"
+- ✅ تصميم متناسق مع بقية الإعدادات
+
+##### **المزامنة التلقائية:**
+- ✅ قراءة حالة Registry عند بدء التطبيق
+- ✅ مزامنة Settings مع الحالة الفعلية
+- ✅ تحديث appsettings.json تلقائياً
+
+##### **معالجة الأخطاء:**
+- ✅ رسائل واضحة عند الفشل
+- ✅ Revert التغييرات عند حدوث خطأ
+- ✅ Debug logging لتتبع المشاكل
+
+#### التقنية المستخدمة:
+- **Registry**: `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`
+- **لا يحتاج Admin Rights**: استخدام HKCU بدلاً من HKLM
+- **القيمة**: مسار كامل للـ exe محاط بعلامات اقتباس
+
+#### الملفات المتأثرة:
+- `NotifyMe.Core/Services/AutoStartService.cs` (جديد)
+- `NotifyMe.Models/UserSettings.cs` (تحديث)
+- `NotifyMe.UI/SettingsWindow.xaml` (تحديث)
+- `NotifyMe.UI/SettingsWindow.xaml.cs` (تحديث)
+- `NotifyMe.UI/App.xaml.cs` (تحديث)
+
+---
+
+### **المرحلة 9: نظام الإشعارات المخصص** ✅ (مكتمل 100%)
+**التاريخ**: 24 نوفمبر 2025
+
+#### الميزات المنفذة:
+
+##### **Custom Notification Window:**
+- ✅ نافذة WPF مخصصة بتصميم داكن (Dark Theme)
+- ✅ دعم 4 مواقع: أعلى/أسفل يمين/يسار
+- ✅ تأثيرات Slide In/Out
+- ✅ إغلاق تلقائي بعد 5 ثواني
+- ✅ أيقونة ونص واضح للحالة
+
+##### **تكامل الإعدادات:**
+- ✅ خيار للتبديل بين Windows Toast و Custom Notifications
+- ✅ خيار لتحديد موقع الإشعار (يظهر فقط عند اختيار Custom)
+- ✅ حفظ التفضيلات في UserSettings
+
+##### **السيناريوهات المدعومة:**
+- ✅ قطع الاتصال (أيقونة حمراء ❌)
+- ✅ استعادة الاتصال (أيقونة خضراء ✅)
+- ✅ تنبيه استهلاك عالي (أيقونة صفراء ⚠️)
+
+#### الملفات المتأثرة:
+- `NotifyMe.UI/Windows/CustomNotificationWindow.xaml` (جديد)
+- `NotifyMe.UI/Windows/CustomNotificationWindow.xaml.cs` (جديد)
+- `NotifyMe.UI/SettingsWindow.xaml` (تحديث)
+- `NotifyMe.UI/SettingsWindow.xaml.cs` (تحديث)
+- `NotifyMe.UI/Services/NotificationService.cs` (تحديث)
+- `NotifyMe.Models/UserSettings.cs` (تحديث)
+
+---
+
 ## 🚀 **المراحل القادمة (من plan v1.md)**
 
-### **المرحلة 6: Do Not Disturb** ⏳
+### **المرحلة 9: Do Not Disturb** ⏳
 - [ ] إضافة جدول زمني في Settings
 - [ ] تعطيل الإشعارات في أوقات محددة
 
@@ -341,10 +414,10 @@ NotifyMe/
 
 ## 📊 **الإحصائيات**
 
-- **عدد الملفات المنشأة**: 20+
-- **عدد الملفات المعدلة**: 35+
-- **عدد الميزات المنفذة**: 55+
-- **نسبة الإنجاز من plan v1.md**: ~75%
+- **عدد الملفات المنشأة**: 21+
+- **عدد الملفات المعدلة**: 40+
+- **عدد الميزات المنفذة**: 60+
+- **نسبة الإنجاز من plan v1.md**: ~80%
 - **عدد الإصلاحات الحرجة**: 3
 
 ---
@@ -354,8 +427,9 @@ NotifyMe/
 - [plan v1.md](file:///d:/Apps/C#/NofiyMe/plan%20v1.md) - الخطة الأصلية
 - [task.md](file:///C:/Users/ACER/.gemini/antigravity/brain/a5786063-2fc5-4391-a41b-ff8d612cd7b3/task.md) - قائمة المهام التفصيلية
 - [walkthrough.md](file:///C:/Users/ACER/.gemini/antigravity/brain/a5786063-2fc5-4391-a41b-ff8d612cd7b3/walkthrough.md) - شرح الإنجازات
-- [SETTINGS_REDESIGN.md](file:///d:/Apps/C#/NofiyMe/SETTINGS_REDESIGN.md) - وثائق تصميم الإعدادات الجديد
+- [SETTINGS_REDESIGN.md](file:///d:/Apps/C#/NofiyMe/SETTINGS_REDESIGN.md) - وثائق تصميم الإعدادات
 - [NOTIFICATION_CONTROLS.md](file:///d:/Apps/C#/NofiyMe/NOTIFICATION_CONTROLS.md) - وثائق التحكم في الإشعارات
+- [AUTOSTART_TESTING.md](file:///d:/Apps/C#/NofiyMe/AUTOSTART_TESTING.md) - اختبار البدء التلقائي
 
 ---
 
@@ -367,7 +441,8 @@ NotifyMe/
 4. **قاعدة البيانات**: تنظيف تلقائي للسجلات القديمة (+30 يوم)
 5. **الإشعارات**: تحكم كامل في Toast و Sound Notifications
 6. **واجهة الإعدادات**: تصميم جديد بالتبويبات أكثر تنظيماً
+7. **Auto-Start**: بدء تلقائي مع Windows بدون Admin rights
 
 ---
 
-**آخر تحديث**: 24 نوفمبر 2025، 11:40
+**آخر تحديث**: 24 نوفمبر 2025، 11:55
