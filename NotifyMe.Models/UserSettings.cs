@@ -10,5 +10,6 @@ public class UserSettings
     // Advanced Settings
     public int UpdateIntervalSeconds { get; set; } = 1;
     public double HighTrafficThresholdMBps { get; set; } = 5.0;
-    public bool EnableSoundNotifications { get; set; } = false;
+    public bool EnableSoundNotifications { get; set; } = true;
+    public bool EnableToastNotifications { get; set; } = true;
 }

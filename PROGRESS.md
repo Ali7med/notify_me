@@ -251,6 +251,76 @@ NotifyMe/
 
 ---
 
+### **المرحلة 6: تحكم في الإشعارات** ✅ (مكتمل 100%)
+**التاريخ**: 24 نوفمبر 2025
+
+#### الميزات المنفذة:
+
+##### **إدارة الإشعارات:**
+- ✅ إضافة `EnableToastNotifications` في UserSettings
+- ✅ إضافة `EnableSoundNotifications` في UserSettings
+- ✅ تحديث NotificationService لاستخدام SettingsService
+- ✅ التحكم الكامل من Settings Window
+
+##### **واجهة الإعدادات:**
+- ✅ CheckBox لتفعيل/إيقاف Toast Notifications
+- ✅ CheckBox لتفعيل/إيقاف Sound Notifications
+- ✅ نصوص توضيحية لكل خيار
+- ✅ حفظ الإعدادات في appsettings.json
+
+#### السيناريوهات المدعومة:
+- ✅ إشعارات + أصوات معاً
+- ✅ إشعارات فقط (بدون أصوات)
+- ✅ أصوات فقط (بدون إشعارات)
+- ✅ تعطيل كامل
+
+#### الملفات المتأثرة:
+- `NotifyMe.Models/UserSettings.cs` (تحديث)
+- `NotifyMe.UI/Services/NotificationService.cs` (تحديث)
+- `NotifyMe.UI/SettingsWindow.xaml` (تحديث)
+- `NotifyMe.UI/SettingsWindow.xaml.cs` (تحديث)
+- `NotifyMe.UI/App.xaml.cs` (تحديث)
+
+---
+
+### **المرحلة 7: إعادة تصميم نافذة الإعدادات** ✅ (مكتمل 100%)
+**التاريخ**: 24 نوفمبر 2025
+
+#### الميزات المنفذة:
+
+##### **التصميم بالتبويبات (TabControl):**
+- ✅ 4 تبويبات منظمة:
+  - 🎨 **Appearance**: شفافية وثيم
+  - 🌐 **Network**: Ping IP مع Quick Select
+  - 🔔 **Notifications**: Toast و Sound
+  - ⚙️ **Advanced**: معدل التحديث وعتبة الحركة
+
+##### **التحسينات البصرية:**
+- ✅ Custom TabItem Style مع Hover Effects
+- ✅ Custom CheckBox Style مع ✓ Mark
+- ✅ أزرار Quick Select لـ DNS (Google, Cloudflare, OpenDNS)
+- ✅ Tip Box في تبويب الإشعارات
+- ✅ Footer منفصل مع زر Save Changes
+- ✅ أيقونات في كل تبويب
+- ✅ نصوص توضيحية شاملة
+
+##### **المواصفات:**
+- ✅ الحجم: 700x600 بكسل
+- ✅ Border Radius: 12px
+- ✅ Drop Shadow: Blur 30px
+- ✅ ScrollViewer لكل تبويب
+
+#### الوظائف الجديدة:
+- ✅ `SetPingHost_Click` لاختيار DNS بسرعة
+- ✅ تنظيم أفضل للإعدادات
+- ✅ وصول أسرع للإعداد المطلوب
+
+#### الملفات المتأثرة:
+- `NotifyMe.UI/SettingsWindow.xaml` (إعادة تصميم كاملة)
+- `NotifyMe.UI/SettingsWindow.xaml.cs` (إضافة SetPingHost_Click)
+
+---
+
 ## 🚀 **المراحل القادمة (من plan v1.md)**
 
 ### **المرحلة 6: Do Not Disturb** ⏳
@@ -271,10 +341,10 @@ NotifyMe/
 
 ## 📊 **الإحصائيات**
 
-- **عدد الملفات المنشأة**: 18+
-- **عدد الملفات المعدلة**: 28+
-- **عدد الميزات المنفذة**: 45+
-- **نسبة الإنجاز من plan v1.md**: ~70%
+- **عدد الملفات المنشأة**: 20+
+- **عدد الملفات المعدلة**: 35+
+- **عدد الميزات المنفذة**: 55+
+- **نسبة الإنجاز من plan v1.md**: ~75%
 - **عدد الإصلاحات الحرجة**: 3
 
 ---
@@ -282,8 +352,10 @@ NotifyMe/
 ## 🔗 **روابط مهمة**
 
 - [plan v1.md](file:///d:/Apps/C#/NofiyMe/plan%20v1.md) - الخطة الأصلية
-- [task.md](file:///C:/Users/ACER/.gemini/antigravity/brain/8f963a85-e6d2-4156-99bf-91d5fe3b8436/task.md) - قائمة المهام التفصيلية
-- [walkthrough.md](file:///C:/Users/ACER/.gemini/antigravity/brain/8f963a85-e6d2-4156-99bf-91d5fe3b8436/walkthrough.md) - شرح Phase 3 & 4
+- [task.md](file:///C:/Users/ACER/.gemini/antigravity/brain/a5786063-2fc5-4391-a41b-ff8d612cd7b3/task.md) - قائمة المهام التفصيلية
+- [walkthrough.md](file:///C:/Users/ACER/.gemini/antigravity/brain/a5786063-2fc5-4391-a41b-ff8d612cd7b3/walkthrough.md) - شرح الإنجازات
+- [SETTINGS_REDESIGN.md](file:///d:/Apps/C#/NofiyMe/SETTINGS_REDESIGN.md) - وثائق تصميم الإعدادات الجديد
+- [NOTIFICATION_CONTROLS.md](file:///d:/Apps/C#/NofiyMe/NOTIFICATION_CONTROLS.md) - وثائق التحكم في الإشعارات
 
 ---
 
@@ -291,9 +363,11 @@ NotifyMe/
 
 1. **الأداء**: التطبيق يعمل بسلاسة مع استهلاك منخفض للموارد
 2. **الاستقرار**: تم إصلاح جميع الأخطاء الحرجة
-3. **التوافق**: يعمل على Windows 10/11 مع .NET 10
+3. **التوافق**: يعمل على Windows 10/11 مع .NET 8
 4. **قاعدة البيانات**: تنظيف تلقائي للسجلات القديمة (+30 يوم)
+5. **الإشعارات**: تحكم كامل في Toast و Sound Notifications
+6. **واجهة الإعدادات**: تصميم جديد بالتبويبات أكثر تنظيماً
 
 ---
 
-**آخر تحديث**: 23 نوفمبر 2025، 14:10
+**آخر تحديث**: 24 نوفمبر 2025، 11:40

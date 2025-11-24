@@ -1,7 +1,8 @@
-﻿using System.Windows;
+using System.Windows;
 using Hardcodet.Wpf.TaskbarNotification;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
+using NotifyMe.UI.Services;
 
 namespace NotifyMe.UI;
 
@@ -43,7 +44,7 @@ public partial class App : Application
             // Continue without logging - non-critical feature
         }
 
-        _notificationService = new NotificationService(_settings);
+        _notificationService = new NotificationService(_settingsService);
         _networkMonitor = new NetworkMonitor(networkInterfaceWrapper, pingWrapper) { CheckIntervalSeconds = _settings.CheckIntervalSeconds };
         _trafficMonitor = new TrafficMonitor(networkInterfaceWrapper) { UpdateIntervalMs = _settings.TrafficUpdateIntervalMs };
 

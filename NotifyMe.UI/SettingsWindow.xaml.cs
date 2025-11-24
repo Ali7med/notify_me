@@ -26,7 +26,8 @@ namespace NotifyMe.UI
                 PingHost = current.PingHost,
                 UpdateIntervalSeconds = current.UpdateIntervalSeconds,
                 HighTrafficThresholdMBps = current.HighTrafficThresholdMBps,
-                EnableSoundNotifications = current.EnableSoundNotifications
+                EnableSoundNotifications = current.EnableSoundNotifications,
+                EnableToastNotifications = current.EnableToastNotifications
             };
 
             // Initialize UI
@@ -35,6 +36,7 @@ namespace NotifyMe.UI
             PingHostTextBox.Text = _tempSettings.PingHost;
             UpdateIntervalSlider.Value = _tempSettings.UpdateIntervalSeconds;
             TrafficThresholdTextBox.Text = _tempSettings.HighTrafficThresholdMBps.ToString("F1");
+            ToastNotificationsCheckBox.IsChecked = _tempSettings.EnableToastNotifications;
             SoundNotificationsCheckBox.IsChecked = _tempSettings.EnableSoundNotifications;
         }
 
@@ -81,7 +83,8 @@ namespace NotifyMe.UI
                     _tempSettings.HighTrafficThresholdMBps = threshold;
                 }
                 
-                _tempSettings.EnableSoundNotifications = SoundNotificationsCheckBox.IsChecked ?? false;
+                _tempSettings.EnableToastNotifications = ToastNotificationsCheckBox.IsChecked ?? true;
+                _tempSettings.EnableSoundNotifications = SoundNotificationsCheckBox.IsChecked ?? true;
             }
                 _settingsService.SaveSettings(_tempSettings);
             Close();
@@ -90,6 +93,14 @@ namespace NotifyMe.UI
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void SetPingHost_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string host)
+            {
+                PingHostTextBox.Text = host;
+            }
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
