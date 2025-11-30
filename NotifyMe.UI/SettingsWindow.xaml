@@ -265,159 +265,191 @@
             </Grid.RowDefinitions>
 
             <!-- Header -->
-            <Grid Grid.Row="0" Margin="25,20,25,15">
-                <StackPanel>
-                    <TextBlock x:Name="HeaderTitle" Text="⚙️ Settings" FontSize="24" FontWeight="Bold" 
-                              Foreground="{StaticResource TextPrimary}"/>
-                    <TextBlock x:Name="HeaderSubtitle" Text="Customize your NotifyMe experience" FontSize="12" 
-                              Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0"/>
-                </StackPanel>
-                <Button x:Name="CloseButton" Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                        Background="Transparent" Foreground="{StaticResource TextSecondary}" 
-                        FontSize="16" Padding="5" Click="CloseButton_Click"/>
-            </Grid>
+            <Border Grid.Row="0" Background="#252525" Padding="25,20" BorderThickness="0,0,0,1" BorderBrush="#333333">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock x:Name="HeaderTitle" Text="⚙️ Settings" FontSize="22" FontWeight="Bold" 
+                                  Foreground="{StaticResource TextPrimary}"/>
+                        <TextBlock x:Name="HeaderSubtitle" Text="Customize your NotifyMe experience" FontSize="11" 
+                                  Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Button x:Name="CloseButton" Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                            Background="Transparent" Foreground="{StaticResource TextSecondary}" 
+                            FontSize="18" Width="32" Height="32" Click="CloseButton_Click"/>
+                </Grid>
+            </Border>
 
             <!-- Content -->
             <TabControl Grid.Row="1" Margin="10">
                 <!-- Appearance Tab -->
                 <TabItem x:Name="TabAppearance" Header="🎨 Appearance">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10" Padding="5">
-                        <StackPanel Margin="20">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid Margin="30">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
                             <!-- Transparency Section -->
-                            <TextBlock x:Name="LblTransparency" Text="Widget Transparency" 
-                                      FontSize="15" FontWeight="SemiBold" 
-                                      Foreground="{StaticResource TextPrimary}" 
-                                      Margin="0,5,0,12"/>
-                            
-                            <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,25">
-                                <StackPanel>
-                                    <Grid Margin="0,0,0,10">
+                            <Border Grid.Row="0" Background="{StaticResource ControlBackground}" 
+                                   CornerRadius="10" Padding="25" BorderBrush="#3A3A3A" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="10"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" x:Name="LblTransparency" Text="Widget Transparency" 
+                                              FontSize="16" FontWeight="SemiBold" 
+                                              Foreground="{StaticResource TextPrimary}"/>
+
+                                    <Grid Grid.Row="2">
                                         <TextBlock Text="Opacity" 
                                                   Foreground="{StaticResource TextSecondary}" 
-                                                  FontSize="12"
+                                                  FontSize="13"
                                                   VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding ElementName=OpacitySlider, Path=Value, StringFormat=P0}" 
                                                   Foreground="{StaticResource AccentColor}" 
-                                                  FontSize="13"
-                                                  FontWeight="SemiBold"
+                                                  FontSize="14"
+                                                  FontWeight="Bold"
                                                   HorizontalAlignment="Right" 
                                                   VerticalAlignment="Center"/>
                                     </Grid>
-                                    
-                                    <Slider x:Name="OpacitySlider" 
-                                            Minimum="0.1" Maximum="1.0" Value="0.8" 
-                                            TickFrequency="0.1" 
-                                            IsSnapToTickEnabled="True"
-                                            Margin="0,5,0,15"
-                                            ValueChanged="OpacitySlider_ValueChanged"/>
-                                    
-                                    <TextBlock x:Name="LblTransparencyDesc" 
+
+                                    <Slider Grid.Row="4" x:Name="OpacitySlider" 
+                                           Minimum="0.1" Maximum="1.0" Value="0.8" 
+                                           TickFrequency="0.1" 
+                                           IsSnapToTickEnabled="True"
+                                           ValueChanged="OpacitySlider_ValueChanged"/>
+
+                                    <TextBlock Grid.Row="6" x:Name="LblTransparencyDesc" 
                                               Text="Adjust how transparent the floating widget appears" 
                                               Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="0,0,0,0"/>
-                                </StackPanel>
+                                              FontSize="12" 
+                                              TextWrapping="Wrap"/>
+                                </Grid>
                             </Border>
 
                             <!-- Theme Section -->
-                            <TextBlock x:Name="LblTheme" Text="Theme Style" 
-                                      FontSize="15" FontWeight="SemiBold" 
-                                      Foreground="{StaticResource TextPrimary}" 
-                                      Margin="0,5,0,12"/>
-                            
-                            <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,25">
-                                <StackPanel>
-                                    <ComboBox x:Name="ThemeComboBox" 
-                                             Height="40"
-                                             Margin="0,0,0,15" 
+                            <Border Grid.Row="2" Background="{StaticResource ControlBackground}" 
+                                   CornerRadius="10" Padding="25" BorderBrush="#3A3A3A" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="10"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" x:Name="LblTheme" Text="Theme Style" 
+                                              FontSize="16" FontWeight="SemiBold" 
+                                              Foreground="{StaticResource TextPrimary}"/>
+
+                                    <ComboBox Grid.Row="2" x:Name="ThemeComboBox" 
+                                             Height="42"
+                                             FontSize="13"
                                              SelectionChanged="ThemeComboBox_SelectionChanged">
                                         <ComboBoxItem Content="✨ Glass (Modern &amp; Transparent)"/>
                                         <ComboBoxItem Content="⬛ Classic (Solid Background)"/>
                                     </ComboBox>
-                                    
-                                    <TextBlock x:Name="LblThemeDesc" 
+
+                                    <TextBlock Grid.Row="4" x:Name="LblThemeDesc" 
                                               Text="Choose your preferred visual style" 
                                               Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11"
+                                              FontSize="12"
                                               TextWrapping="Wrap"/>
-                                </StackPanel>
+                                </Grid>
                             </Border>
-                        </StackPanel>
+                        </Grid>
                     </ScrollViewer>
                 </TabItem>
 
                 <!-- Network Tab -->
                 <TabItem x:Name="TabNetwork" Header="🌐 Network">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10" Padding="5">
-                        <StackPanel Margin="20">
-                            <!-- Ping Host Section -->
-                            <TextBlock x:Name="LblPingHost" Text="Connectivity Test Server" 
-                                      FontSize="15" FontWeight="SemiBold" 
-                                      Foreground="{StaticResource TextPrimary}" 
-                                      Margin="0,5,0,12"/>
-                            
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid Margin="30">
                             <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,25">
-                                <StackPanel>
-                                    <TextBox x:Name="PingHostTextBox" 
-                                            Height="45" 
+                                   CornerRadius="10" Padding="25" BorderBrush="#3A3A3A" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="10"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="10"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" x:Name="LblPingHost" Text="Connectivity Test Server" 
+                                              FontSize="16" FontWeight="SemiBold" 
+                                              Foreground="{StaticResource TextPrimary}"/>
+
+                                    <TextBox Grid.Row="2" x:Name="PingHostTextBox" 
+                                            Height="48" 
                                             VerticalContentAlignment="Center" 
-                                            Padding="15,0" 
+                                            Padding="15" 
                                             Background="#1E1E1E" 
                                             Foreground="White" 
-                                            FontSize="13"
-                                            BorderThickness="0" 
-                                            Margin="0,0,0,15">
+                                            FontSize="14"
+                                            BorderThickness="1"
+                                            BorderBrush="#3A3A3A">
                                         <TextBox.Resources>
                                             <Style TargetType="{x:Type Border}">
-                                                <Setter Property="CornerRadius" Value="6"/>
+                                                <Setter Property="CornerRadius" Value="8"/>
                                             </Style>
                                         </TextBox.Resources>
                                     </TextBox>
-                                    
-                                    <TextBlock x:Name="LblPingHostDesc" 
+
+                                    <TextBlock Grid.Row="4" x:Name="LblPingHostDesc" 
                                               Text="IP address used to check internet connectivity (e.g., 8.8.8.8, 1.1.1.1)" 
                                               Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11"
-                                              TextWrapping="Wrap"
-                                              Margin="0,0,0,20"/>
-                                    
-                                    <TextBlock x:Name="LblQuickSelect" 
-                                              Text="Quick Select:" 
-                                              Margin="0,0,0,10" 
                                               FontSize="12"
+                                              TextWrapping="Wrap"/>
+
+                                    <TextBlock Grid.Row="6" x:Name="LblQuickSelect" 
+                                              Text="Quick Select:" 
+                                              FontSize="13"
                                               FontWeight="SemiBold"
                                               Foreground="{StaticResource TextPrimary}"/>
-                                    
-                                    <WrapPanel>
+
+                                    <WrapPanel Grid.Row="8" Orientation="Horizontal">
                                         <Button Content="Google (8.8.8.8)" 
                                                Tag="8.8.8.8" 
                                                Click="SetPingHost_Click" 
                                                Margin="0,0,10,10" 
                                                FontSize="12" 
-                                               Padding="15,8" 
+                                               Padding="15,10" 
                                                Background="#3A3A3A"/>
                                         <Button Content="Cloudflare (1.1.1.1)" 
                                                Tag="1.1.1.1" 
                                                Click="SetPingHost_Click" 
                                                Margin="0,0,10,10" 
                                                FontSize="12" 
-                                               Padding="15,8" 
+                                               Padding="15,10" 
                                                Background="#3A3A3A"/>
                                         <Button Content="OpenDNS (208.67.222.222)" 
                                                Tag="208.67.222.222" 
                                                Click="SetPingHost_Click" 
                                                Margin="0,0,0,10" 
                                                FontSize="12" 
-                                               Padding="15,8" 
+                                               Padding="15,10" 
                                                Background="#3A3A3A"/>
                                     </WrapPanel>
-                                </StackPanel>
+                                </Grid>
                             </Border>
-                        </StackPanel>
+                        </Grid>
                     </ScrollViewer>
                 </TabItem>
 
