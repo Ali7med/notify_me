@@ -10,4 +10,5 @@ public interface INetworkAdapter
     OperationalStatus OperationalStatus { get; }
     NetworkInterfaceType NetworkInterfaceType { get; }
     INetworkStatistics GetIPv4Statistics();
+    IEnumerable<string> GetIPv4Addresses();
 }

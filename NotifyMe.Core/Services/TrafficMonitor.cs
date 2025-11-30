@@ -102,7 +102,9 @@ public class TrafficMonitor
                     DownloadSpeedBytesPerSecond = Math.Max(0, downloadSpeed),
                     UploadSpeedBytesPerSecond = Math.Max(0, uploadSpeed),
                     TotalBytesReceived = bytesReceived,
-                    TotalBytesSent = bytesSent
+                    TotalBytesSent = bytesSent,
+                    InterfaceName = _activeInterface.Name,
+                    IPv4Address = _activeInterface.GetIPv4Addresses().FirstOrDefault() ?? "0.0.0.0"
                 };
 
                 _lastBytesReceived = bytesReceived;

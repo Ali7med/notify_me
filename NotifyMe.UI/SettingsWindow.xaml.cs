@@ -176,8 +176,6 @@ namespace NotifyMe.UI
             // Notifications Tab
             if (LblAlertPreferences != null)
                 LblAlertPreferences.Text = lang.Settings.AlertPreferences;
-            if (LblNotificationType != null)
-                LblNotificationType.Text = lang.Settings.NotificationType;
             if (LblWindowsToastDesc != null)
                 LblWindowsToastDesc.Text = lang.Settings.WindowsToastDesc;
             if (LblCustomNotificationsDesc != null)

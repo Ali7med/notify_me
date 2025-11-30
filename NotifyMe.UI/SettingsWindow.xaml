@@ -455,59 +455,77 @@
 
                 <!-- Notifications Tab -->
                 <TabItem x:Name="TabNotifications" Header="🔔 Notifications">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10" Padding="5">
-                        <StackPanel Margin="20">
-                            <!-- Alert Preferences Section -->
-                            <TextBlock x:Name="LblAlertPreferences" Text="Alert Preferences" 
-                                      FontSize="15" FontWeight="SemiBold" 
-                                      Foreground="{StaticResource TextPrimary}" 
-                                      Margin="0,5,0,12"/>
-                            
-                            <!-- Notification Type -->
-                            <TextBlock x:Name="LblNotificationType" Text="Notification Type" 
-                                      FontSize="13" 
-                                      Foreground="{StaticResource TextSecondary}" 
-                                      Margin="0,0,0,10"/>
-                            
-                            <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,20">
-                                <StackPanel>
-                                    <RadioButton x:Name="ToastNotificationRadio" GroupName="NotifType" 
-                                                Content="🪟 Windows Toast Notifications" 
-                                                FontSize="13" 
-                                                Margin="0,0,0,10"
-                                                Checked="ToastNotificationRadio_Checked"/>
-                                    <TextBlock x:Name="LblWindowsToastDesc" 
-                                              Text="Use built-in Windows notifications (shows in Action Center)" 
-                                              Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="28,0,0,18"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid Margin="30">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                                    <RadioButton x:Name="CustomNotificationRadio" GroupName="NotifType" 
-                                                Content="✨ Custom Notifications" 
-                                                FontSize="13" 
-                                                Margin="0,0,0,10"
-                                                Checked="CustomNotificationRadio_Checked"/>
-                                    <TextBlock x:Name="LblCustomNotificationsDesc" 
-                                              Text="Use custom notification window with configurable position" 
-                                              Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="28,0,0,15"/>
-                                    
-                                    <!-- Position Selector (Visible only for Custom) -->
-                                    <StackPanel x:Name="CustomPositionPanel" 
+                            <!-- Notification Type Section -->
+                            <Border Grid.Row="0" Background="{StaticResource ControlBackground}" 
+                                   CornerRadius="10" Padding="25" BorderBrush="#3A3A3A" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" x:Name="LblAlertPreferences" Text="Alert Preferences" 
+                                              FontSize="16" FontWeight="SemiBold" 
+                                              Foreground="{StaticResource TextPrimary}"/>
+
+                                    <!-- Radio Options -->
+                                    <StackPanel Grid.Row="2">
+                                        <RadioButton x:Name="ToastNotificationRadio" GroupName="NotifType" 
+                                                    Content="🪟 Windows Toast Notifications" 
+                                                    FontSize="13" 
+                                                    Margin="0,0,0,8"
+                                                    Checked="ToastNotificationRadio_Checked"/>
+                                        <TextBlock x:Name="LblWindowsToastDesc" 
+                                                  Text="Use built-in Windows notifications" 
+                                                  Foreground="{StaticResource TextSecondary}" 
+                                                  FontSize="11.5" 
+                                                  TextWrapping="Wrap"
+                                                  Margin="28,0,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4">
+                                        <RadioButton x:Name="CustomNotificationRadio" GroupName="NotifType" 
+                                                    Content="✨ Custom Notifications" 
+                                                    FontSize="13" 
+                                                    Margin="0,0,0,8"
+                                                    Checked="CustomNotificationRadio_Checked"/>
+                                        <TextBlock x:Name="LblCustomNotificationsDesc" 
+                                                  Text="Custom notification window with configurable position" 
+                                                  Foreground="{StaticResource TextSecondary}" 
+                                                  FontSize="11.5" 
+                                                  TextWrapping="Wrap"
+                                                  Margin="28,0,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Position Selector -->
+                                    <StackPanel Grid.Row="6" x:Name="CustomPositionPanel" 
                                                Visibility="Collapsed" 
-                                               Margin="28,5,0,5">
+                                               Margin="28,10,0,0">
                                         <TextBlock x:Name="LblNotificationPosition" 
-                                                  Text="Notification Position:" 
+                                                  Text="Position:" 
                                                   Foreground="{StaticResource TextPrimary}" 
                                                   FontSize="12"
-                                                  Margin="0,0,0,8"/>
+                                                  Margin="0,0,0,10"/>
                                         <ComboBox x:Name="NotificationPositionComboBox" 
-                                                 Width="220" 
-                                                 Height="40"
+                                                 Width="200" 
+                                                 Height="42"
                                                  HorizontalAlignment="Left">
                                             <ComboBoxItem Content="⬈ Top Right" Tag="TopRight" IsSelected="True"/>
                                             <ComboBoxItem Content="⬉ Top Left" Tag="TopLeft"/>
@@ -515,142 +533,162 @@
                                             <ComboBoxItem Content="⬋ Bottom Left" Tag="BottomLeft"/>
                                         </ComboBox>
                                     </StackPanel>
-                                </StackPanel>
+                                </Grid>
                             </Border>
 
-                            <!-- Toast Notifications -->
-                            <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,20">
-                                <StackPanel>
-                                    <CheckBox x:Name="ToastNotificationsCheckBox" 
-                                             Content="📢 Show Toast Notifications" 
-                                             FontSize="13" 
-                                             Margin="0,0,0,10"/>
-                                    <TextBlock x:Name="LblShowToastDesc" 
-                                              Text="Display popup notifications when internet connection changes" 
-                                              Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="32,0,0,0"/>
-                                </StackPanel>
-                            </Border>
+                            <!-- Toast & Sound Options -->
+                            <Border Grid.Row="2" Background="{StaticResource ControlBackground}" 
+                                   CornerRadius="10" Padding="25" BorderBrush="#3A3A3A" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                            <!-- Sound Notifications -->
-                            <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,25">
-                                <StackPanel>
-                                    <CheckBox x:Name="SoundNotificationsCheckBox" 
-                                             Content="🔊 Play Sound Alerts" 
-                                             FontSize="13" 
-                                             Margin="0,0,0,10"/>
-                                    <TextBlock x:Name="LblPlaySoundDesc" 
-                                              Text="Play audio when connection is lost or restored" 
-                                              Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="32,0,0,0"/>
-                                </StackPanel>
+                                    <!-- Toast Option -->
+                                    <StackPanel Grid.Row="0">
+                                        <CheckBox x:Name="ToastNotificationsCheckBox" 
+                                                 Content="📢 Show Toast Notifications" 
+                                                 FontSize="13" 
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="LblShowToastDesc" 
+                                                  Text="Display popup when connection changes" 
+                                                  Foreground="{StaticResource TextSecondary}" 
+                                                  FontSize="11.5" 
+                                                  TextWrapping="Wrap"
+                                                  Margin="28,0,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Sound Option -->
+                                    <StackPanel Grid.Row="2">
+                                        <CheckBox x:Name="SoundNotificationsCheckBox" 
+                                                 Content="🔊 Play Sound Alerts" 
+                                                 FontSize="13" 
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="LblPlaySoundDesc" 
+                                                  Text="Play audio when connection is lost or restored" 
+                                                  Foreground="{StaticResource TextSecondary}" 
+                                                  FontSize="11.5" 
+                                                  TextWrapping="Wrap"
+                                                  Margin="28,0,0,0"/>
+                                    </StackPanel>
+                                </Grid>
                             </Border>
 
                             <!-- Do Not Disturb Section -->
-                            <TextBlock x:Name="LblDoNotDisturb" Text="Do Not Disturb" 
-                                      FontSize="15" FontWeight="SemiBold" 
-                                      Foreground="{StaticResource TextPrimary}" 
-                                      Margin="0,10,0,12"/>
-                            
-                            <Border Background="{StaticResource ControlBackground}" 
-                                   CornerRadius="8" Padding="20" Margin="0,0,0,20">
-                                <StackPanel>
+                            <Border Grid.Row="4" Background="{StaticResource ControlBackground}" 
+                                   CornerRadius="10" Padding="25" BorderBrush="#3A3A3A" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="15"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" x:Name="LblDoNotDisturb" Text="Do Not Disturb" 
+                                              FontSize="16" FontWeight="SemiBold" 
+                                              Foreground="{StaticResource TextPrimary}"/>
+
                                     <!-- Manual Toggle -->
-                                    <CheckBox x:Name="EnableDNDCheckBox" 
-                                             Content="🌙 Do Not Disturb Now" 
-                                             FontSize="13" 
-                                             Margin="0,0,0,10"/>
-                                    <TextBlock x:Name="LblDNDNowDesc" 
-                                              Text="Silence all notifications immediately" 
-                                              Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="32,0,0,20"/>
+                                    <StackPanel Grid.Row="2">
+                                        <CheckBox x:Name="EnableDNDCheckBox" 
+                                                 Content="🌙 Do Not Disturb Now" 
+                                                 FontSize="13" 
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="LblDNDNowDesc" 
+                                                  Text="Silence all notifications immediately" 
+                                                  Foreground="{StaticResource TextSecondary}" 
+                                                  FontSize="11.5" 
+                                                  TextWrapping="Wrap"
+                                                  Margin="28,0,0,0"/>
+                                    </StackPanel>
 
                                     <!-- Schedule Toggle -->
-                                    <CheckBox x:Name="EnableDNDScheduleCheckBox" 
-                                             Content="📅 Scheduled DND" 
-                                             FontSize="13" 
-                                             Margin="0,0,0,10"
-                                             Checked="EnableDNDScheduleCheckBox_Checked"
-                                             Unchecked="EnableDNDScheduleCheckBox_Unchecked"/>
-                                    <TextBlock x:Name="LblDNDScheduleDesc" 
-                                              Text="Automatically silence notifications during specific hours" 
-                                              Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11" 
-                                              TextWrapping="Wrap"
-                                              Margin="32,0,0,15"/>
+                                    <StackPanel Grid.Row="4">
+                                        <CheckBox x:Name="EnableDNDScheduleCheckBox" 
+                                                 Content="📅 Scheduled DND" 
+                                                 FontSize="13" 
+                                                 Margin="0,0,0,8"
+                                                 Checked="EnableDNDScheduleCheckBox_Checked"
+                                                 Unchecked="EnableDNDScheduleCheckBox_Unchecked"/>
+                                        <TextBlock x:Name="LblDNDScheduleDesc" 
+                                                  Text="Automatically silence during specific hours" 
+                                                  Foreground="{StaticResource TextSecondary}" 
+                                                  FontSize="11.5" 
+                                                  TextWrapping="Wrap"
+                                                  Margin="28,0,0,0"/>
+                                    </StackPanel>
 
                                     <!-- Schedule Controls -->
-                                    <StackPanel x:Name="DNDSchedulePanel" 
+                                    <StackPanel Grid.Row="6" x:Name="DNDSchedulePanel" 
                                                Visibility="Collapsed" 
-                                               Margin="32,5,0,0">
+                                               Margin="28,10,0,0">
+                                        <!-- Start Time -->
                                         <Grid Margin="0,0,0,15">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
+                                                <ColumnDefinition Width="90"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock x:Name="LblStartTime" 
                                                       Text="Start Time:" 
                                                       VerticalAlignment="Center" 
                                                       Foreground="{StaticResource TextPrimary}" 
-                                                      FontSize="12"
-                                                      Margin="0,0,10,0"/>
+                                                      FontSize="12"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                                 <ComboBox x:Name="DNDStartHourCombo" 
                                                          Width="70" 
-                                                         Height="35"/>
+                                                         Height="38"/>
                                                 <TextBlock Text=":" 
                                                           VerticalAlignment="Center" 
-                                                          FontSize="14"
-                                                          Margin="8,0"/>
+                                                          FontSize="15"
+                                                          Foreground="{StaticResource TextPrimary}"
+                                                          Margin="10,0"/>
                                                 <ComboBox x:Name="DNDStartMinuteCombo" 
                                                          Width="70" 
-                                                         Height="35"/>
+                                                         Height="38"/>
                                             </StackPanel>
                                         </Grid>
-                                        
+
+                                        <!-- End Time -->
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
+                                                <ColumnDefinition Width="90"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock x:Name="LblEndTime" 
                                                       Text="End Time:" 
                                                       VerticalAlignment="Center" 
                                                       Foreground="{StaticResource TextPrimary}" 
-                                                      FontSize="12"
-                                                      Margin="0,0,10,0"/>
+                                                      FontSize="12"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                                 <ComboBox x:Name="DNDEndHourCombo" 
                                                          Width="70" 
-                                                         Height="35"/>
+                                                         Height="38"/>
                                                 <TextBlock Text=":" 
                                                           VerticalAlignment="Center" 
-                                                          FontSize="14"
-                                                          Margin="8,0"/>
+                                                          FontSize="15"
+                                                          Foreground="{StaticResource TextPrimary}"
+                                                          Margin="10,0"/>
                                                 <ComboBox x:Name="DNDEndMinuteCombo" 
                                                          Width="70" 
-                                                         Height="35"/>
+                                                         Height="38"/>
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
-                                </StackPanel>
+                                </Grid>
                             </Border>
 
                             <!-- Tip Box -->
-                            <Border Background="#2A2A3A" 
+                            <Border Grid.Row="6" Background="#2A2A3A" 
                                    CornerRadius="8" 
                                    Padding="20" 
                                    BorderThickness="1" 
-                                   BorderBrush="{StaticResource AccentColor}"
-                                   Margin="0,0,0,10">
+                                   BorderBrush="{StaticResource AccentColor}">
                                 <StackPanel>
                                     <TextBlock x:Name="LblTipTitle" 
                                               Text="💡 Tip" 
@@ -659,16 +697,14 @@
                                               Foreground="{StaticResource AccentColor}" 
                                               Margin="0,0,0,8"/>
                                     <TextBlock x:Name="LblTipBody" 
+                                              Text="You can enable both toast notifications and sound alerts for comprehensive feedback, or choose just one based on your preference." 
                                               TextWrapping="Wrap" 
                                               Foreground="{StaticResource TextSecondary}" 
-                                              FontSize="11"
-                                              LineHeight="16">
-                                        You can enable both, one, or neither option based on your preference. 
-                                        Toast notifications show detailed info, while sounds provide quick audio feedback.
-                                    </TextBlock>
+                                              FontSize="11.5"
+                                              LineHeight="17"/>
                                 </StackPanel>
                             </Border>
-                        </StackPanel>
+                        </Grid>
                     </ScrollViewer>
                 </TabItem>
 

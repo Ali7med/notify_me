@@ -1,6 +1,7 @@
-<Window x:Class="NotifyMe.UI.FloatingIconWindow"
+    <Window x:Class="NotifyMe.UI.FloatingIconWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         Title="Network Monitor" Height="70" Width="180"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" Topmost="True"
@@ -48,6 +49,53 @@
             <Border.Background>
                 <SolidColorBrush Color="#0A0A0A" Opacity="0.95"/>
             </Border.Background>
+            
+            <Border.ToolTip>
+                <ToolTip Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Network Status" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,5"/>
+                        <Separator Background="#333333" Margin="0,0,0,5"/>
+                        
+                        <Grid Margin="0,0,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Network:" Foreground="#AAAAAA" FontSize="11"/>
+                            <TextBlock x:Name="TooltipNetworkName" Text="Unknown" Foreground="#FFFFFF" FontSize="11" Grid.Column="1"/>
+                        </Grid>
+                        
+                        <Grid Margin="0,0,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="IP Address:" Foreground="#AAAAAA" FontSize="11"/>
+                            <TextBlock x:Name="TooltipIPAddress" Text="Loading..." Foreground="#FFFFFF" FontSize="11" Grid.Column="1"/>
+                        </Grid>
+                        
+                        <Separator Background="#333333" Margin="0,5"/>
+                        
+                        <Grid Margin="0,0,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Session DL:" Foreground="#AAAAAA" FontSize="11"/>
+                            <TextBlock x:Name="TooltipSessionDownload" Text="0 MB" Foreground="#4CC2FF" FontSize="11" Grid.Column="1"/>
+                        </Grid>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Session UL:" Foreground="#AAAAAA" FontSize="11"/>
+                            <TextBlock x:Name="TooltipSessionUpload" Text="0 MB" Foreground="#FFD700" FontSize="11" Grid.Column="1"/>
+                        </Grid>
+                    </StackPanel>
+                </ToolTip>
+            </Border.ToolTip>
 
             <Grid Margin="10,5">
                 <Grid.RowDefinitions>
@@ -60,6 +108,16 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Mini Chart (Background) -->
+                <lvc:CartesianChart x:Name="MiniChart" 
+                                   Grid.RowSpan="3" 
+                                   Grid.ColumnSpan="2" 
+                                   Margin="-5"
+                                   Opacity="0.3"
+                                   IsHitTestVisible="False"
+                                   Visibility="Collapsed">
+                </lvc:CartesianChart>
+
                 <!-- Status Indicator Bar -->
                 <Border x:Name="StatusBar" Grid.RowSpan="3" Width="3" CornerRadius="1.5" Background="#4CC2FF" Margin="0,2,8,2">
                     <Border.Effect>
@@ -67,45 +125,68 @@
                     </Border.Effect>
                 </Border>
 
-                <!-- Speed Stats -->
-                <Grid Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <!-- Download -->
-                    <StackPanel Orientation="Horizontal">
-                        <Path Data="M 0 0 L 3.5 3.5 L 7 0" Stroke="#4CC2FF" StrokeThickness="1.5" 
-                              VerticalAlignment="Center" Margin="0,1,4,0"/>
-                        <TextBlock x:Name="DownloadText" Text="0.0 K" 
-                                   Foreground="#E0E0E0" 
-                                   FontSize="11" FontWeight="SemiBold" FontFamily="Segoe UI Variable Display, Segoe UI"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
+                <!-- Normal View Grid -->
+                <Grid x:Name="NormalViewGrid" Grid.Column="1" Grid.RowSpan="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- Upload -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Path Data="M 0 3.5 L 3.5 0 L 7 3.5" Stroke="#FFD700" StrokeThickness="1.5" 
-                              VerticalAlignment="Center" Margin="0,1,4,0"/>
-                        <TextBlock x:Name="UploadText" Text="0.0 K" 
-                                   Foreground="#E0E0E0" 
-                                   FontSize="11" FontWeight="SemiBold" FontFamily="Segoe UI Variable Display, Segoe UI"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
+                    <!-- Speed Stats -->
+                    <Grid Grid.Row="0" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Download -->
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="M 0 0 L 3.5 3.5 L 7 0" Stroke="#4CC2FF" StrokeThickness="1.5" 
+                                  VerticalAlignment="Center" Margin="0,1,4,0"/>
+                            <TextBlock x:Name="DownloadText" Text="0.0 K" 
+                                       Foreground="#E0E0E0" 
+                                       FontSize="11" FontWeight="SemiBold" FontFamily="Segoe UI Variable Display, Segoe UI"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Upload -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Path Data="M 0 3.5 L 3.5 0 L 7 3.5" Stroke="#FFD700" StrokeThickness="1.5" 
+                                  VerticalAlignment="Center" Margin="0,1,4,0"/>
+                            <TextBlock x:Name="UploadText" Text="0.0 K" 
+                                       Foreground="#E0E0E0" 
+                                       FontSize="11" FontWeight="SemiBold" FontFamily="Segoe UI Variable Display, Segoe UI"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Divider -->
+                    <Border Grid.Row="1" Height="1" Background="#333333" Margin="0,2"/>
+
+                    <!-- Ping Stats -->
+                    <Grid Grid.Row="2" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="PING" Foreground="#888888" FontSize="9" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="PingText" Text="-- ms" 
+                                       Foreground="#FFFFFF" 
+                                       FontSize="11" FontWeight="Bold" FontFamily="Segoe UI Variable Display, Segoe UI"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
 
-                <!-- Divider -->
-                <Border Grid.Row="1" Grid.Column="1" Height="1" Background="#333333" Margin="0,2"/>
-
-                <!-- Ping Stats -->
-                <Grid Grid.Column="1" Grid.Row="2" VerticalAlignment="Center">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="PING" Foreground="#888888" FontSize="9" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBlock x:Name="PingText" Text="-- ms" 
+                <!-- Compact View Grid (For Circle Mode) -->
+                <Grid x:Name="CompactViewGrid" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="3" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock x:Name="TotalSpeedText" Text="0.0 M" 
                                    Foreground="#FFFFFF" 
-                                   FontSize="11" FontWeight="Bold" FontFamily="Segoe UI Variable Display, Segoe UI"
-                                   VerticalAlignment="Center"/>
+                                   FontSize="12" FontWeight="Bold" FontFamily="Segoe UI Variable Display, Segoe UI"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Total" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="9" 
+                                   HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -115,7 +196,14 @@
             <ContextMenu>
                 <MenuItem Header="Open NotifyMe" Click="MenuItem_Open_Click" FontWeight="Bold" Tag="OpenNotifyMe"/>
                 <Separator/>
+                <MenuItem x:Name="MenuShowMiniChart" Header="Show Mini Chart" IsCheckable="True" Click="MenuItem_ShowMiniChart_Click" Tag="ShowMiniChart"/>
+                <MenuItem Header="Widget Shape">
+                    <MenuItem Header="Pill (Default)" Tag="Shape_Pill" Click="MenuItem_Shape_Click"/>
+                    <MenuItem Header="Square" Tag="Shape_Square" Click="MenuItem_Shape_Click"/>
+                    <MenuItem Header="Circle (Compact)" Tag="Shape_Circle" Click="MenuItem_Shape_Click"/>
+                </MenuItem>
                 <MenuItem Header="Settings" Click="MenuItem_Settings_Click" Tag="Settings"/>
+                <Separator/>
                 <MenuItem Header="Hide Widget" Click="MenuItem_Hide_Click" Tag="HideWidget"/>
                 <MenuItem Header="Exit Application" Click="MenuItem_Exit_Click" Tag="ExitApplication"/>
             </ContextMenu>

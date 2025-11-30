@@ -22,4 +22,11 @@ public class NetworkAdapterWrapper : INetworkAdapter
     {
         return new NetworkStatisticsWrapper(_networkInterface.GetIPv4Statistics());
     }
+
+    public IEnumerable<string> GetIPv4Addresses()
+    {
+        return _networkInterface.GetIPProperties().UnicastAddresses
+            .Where(ua => ua.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            .Select(ua => ua.Address.ToString());
+    }
 }

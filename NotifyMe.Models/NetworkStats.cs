@@ -8,6 +8,8 @@ public class NetworkStats
     public double UploadSpeedBytesPerSecond { get; set; }
     public long TotalBytesReceived { get; set; }
     public long TotalBytesSent { get; set; }
+    public string InterfaceName { get; set; } = "Unknown";
+    public string IPv4Address { get; set; } = "0.0.0.0";
 
     public string DownloadSpeedFormatted => FormatSpeed(DownloadSpeedBytesPerSecond);
     public string UploadSpeedFormatted => FormatSpeed(UploadSpeedBytesPerSecond);

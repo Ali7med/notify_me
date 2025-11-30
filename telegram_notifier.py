@@ -95,6 +95,42 @@ class TelegramNotifier:
         
         return self.send_message(message)
     
+    def send_document(self, file_path, caption=""):
+        """إرسال ملف إلى جميع المستخدمين المحددين"""
+        import os
+        
+        if not os.path.exists(file_path):
+            print(f"❌ الملف غير موجود: {file_path}")
+            return [(None, False, "File not found")]
+        
+        results = []
+        
+        for chat_id in self.chat_ids:
+            url = f"{self.base_url}/sendDocument"
+            
+            try:
+                with open(file_path, 'rb') as file:
+                    files = {'document': file}
+                    data = {
+                        'chat_id': chat_id,
+                        'caption': caption,
+                        'parse_mode': 'HTML'
+                    }
+                    
+                    response = requests.post(url, data=data, files=files, timeout=30)
+                    
+                    if response.status_code == 200:
+                        results.append((chat_id, True, "Success"))
+                        print(f"✅ تم إرسال الملف إلى {chat_id}")
+                    else:
+                        results.append((chat_id, False, response.text))
+                        print(f"❌ فشل إرسال الملف إلى {chat_id}: {response.text}")
+            except Exception as e:
+                results.append((chat_id, False, str(e)))
+                print(f"❌ خطأ في إرسال الملف إلى {chat_id}: {str(e)}")
+        
+        return results
+    
     def add_chat_id(self, new_chat_id):
         """إضافة رقم مستخدم جديد"""
         if new_chat_id not in self.chat_ids:
@@ -121,6 +157,9 @@ def main():
     # إرسال رسالة مخصصة
     python telegram_notifier.py custom "العنوان" "الرسالة"
     
+    # إرسال ملف
+    python telegram_notifier.py file "مسار_الملف" ["وصف الملف"]
+    
     # اختبار البوت
     python telegram_notifier.py test
 
@@ -128,6 +167,7 @@ def main():
     python telegram_notifier.py task "إصلاح نافذة الإعدادات"
     python telegram_notifier.py phase "المرحلة الأولى" 5
     python telegram_notifier.py custom "تحديث" "تم إضافة ميزة جديدة"
+    python telegram_notifier.py file "roadmap.md" "خارطة الطريق"
     python telegram_notifier.py test
         """)
         return
@@ -157,6 +197,19 @@ def main():
         title = sys.argv[2]
         message = sys.argv[3]
         notifier.send_custom_message(title, message)
+    
+    elif command == "file":
+        if len(sys.argv) < 3:
+            print("❌ يجب تحديد مسار الملف")
+            return
+        file_path = sys.argv[2]
+        caption = sys.argv[3] if len(sys.argv) > 3 else ""
+        
+        # إضافة emoji ووقت للوصف
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        full_caption = f"📄 <b>{caption}</b>\n⏰ {timestamp}" if caption else f"📄 ملف\n⏰ {timestamp}"
+        
+        notifier.send_document(file_path, full_caption)
     
     elif command == "test":
         print("🧪 اختبار البوت...")

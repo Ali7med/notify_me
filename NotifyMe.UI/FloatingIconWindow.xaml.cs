@@ -1,11 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
+using SkiaSharp;
 
 namespace NotifyMe.UI
 {
@@ -18,6 +25,13 @@ namespace NotifyMe.UI
         private readonly Action _openAppAction;
         private readonly Action _openSettingsAction;
 
+        // Chart Properties
+        private readonly ObservableCollection<double> _downloadValues;
+        private readonly ObservableCollection<double> _uploadValues;
+        public ISeries[] Series { get; set; }
+        public Axis[] XAxes { get; set; }
+        public Axis[] YAxes { get; set; }
+
         public FloatingIconWindow(NetworkMonitor networkMonitor, TrafficMonitor trafficMonitor, SettingsService settingsService, Action openAppAction, Action openSettingsAction)
         {
             InitializeComponent();
@@ -26,6 +40,37 @@ namespace NotifyMe.UI
             _settingsService = settingsService;
             _openAppAction = openAppAction;
             _openSettingsAction = openSettingsAction;
+
+            // Initialize Chart Data
+            _downloadValues = new ObservableCollection<double>(Enumerable.Repeat(0.0, 20));
+            _uploadValues = new ObservableCollection<double>(Enumerable.Repeat(0.0, 20));
+
+            Series = new ISeries[]
+            {
+                new LineSeries<double>
+                {
+                    Values = _downloadValues,
+                    Fill = new SolidColorPaint(SKColors.DodgerBlue.WithAlpha(50)),
+                    Stroke = new SolidColorPaint(SKColors.DodgerBlue) { StrokeThickness = 1 },
+                    GeometrySize = 0,
+                    LineSmoothness = 1
+                },
+                new LineSeries<double>
+                {
+                    Values = _uploadValues,
+                    Fill = new SolidColorPaint(SKColors.Gold.WithAlpha(50)),
+                    Stroke = new SolidColorPaint(SKColors.Gold) { StrokeThickness = 1 },
+                    GeometrySize = 0,
+                    LineSmoothness = 1
+                }
+            };
+
+            XAxes = new Axis[] { new Axis { IsVisible = false } };
+            YAxes = new Axis[] { new Axis { IsVisible = false } };
+
+            MiniChart.Series = Series;
+            MiniChart.XAxes = XAxes;
+            MiniChart.YAxes = YAxes;
 
             // Apply initial settings
             ApplySettings(_settingsService.CurrentSettings);
@@ -59,6 +104,9 @@ namespace NotifyMe.UI
                             case "OpenNotifyMe":
                                 menuItem.Header = lang.FloatingWidget.OpenNotifyMe;
                                 break;
+                            case "ShowMiniChart":
+                                menuItem.Header = "Show Mini Chart"; // TODO: Add to strings
+                                break;
                             case "Settings":
                                 menuItem.Header = lang.FloatingWidget.Settings;
                                 break;
@@ -91,10 +139,60 @@ namespace NotifyMe.UI
             
             _networkMonitor.PingHost = settings.PingHost;
             
+            // Update Mini Chart Visibility and Menu State
+            MiniChart.Visibility = settings.ShowMiniChart ? Visibility.Visible : Visibility.Collapsed;
+            if (MenuShowMiniChart != null)
+            {
+                MenuShowMiniChart.IsChecked = settings.ShowMiniChart;
+            }
+            
+            // Apply Widget Shape
+            ApplyShape(settings.FloatingWidgetShape);
+            
             // Update timer interval (only if timer is already initialized)
             if (_timer != null)
             {
                 _timer.Interval = TimeSpan.FromSeconds(settings.UpdateIntervalSeconds);
+            }
+        }
+
+        private void ApplyShape(string shape)
+        {
+            // Default to Pill if null
+            if (string.IsNullOrEmpty(shape)) shape = "Pill";
+
+            switch (shape)
+            {
+                case "Square":
+                    Width = 150;
+                    Height = 70;
+                    MainBorder.CornerRadius = new CornerRadius(4);
+                    GlowBorder.CornerRadius = new CornerRadius(4);
+                    NormalViewGrid.Visibility = Visibility.Visible;
+                    CompactViewGrid.Visibility = Visibility.Collapsed;
+                    StatusBar.Visibility = Visibility.Visible;
+                    break;
+
+                case "Circle":
+                    Width = 80;
+                    Height = 80;
+                    MainBorder.CornerRadius = new CornerRadius(40);
+                    GlowBorder.CornerRadius = new CornerRadius(40);
+                    NormalViewGrid.Visibility = Visibility.Collapsed;
+                    CompactViewGrid.Visibility = Visibility.Visible;
+                    StatusBar.Visibility = Visibility.Collapsed;
+                    break;
+
+                case "Pill":
+                default:
+                    Width = 180;
+                    Height = 70;
+                    MainBorder.CornerRadius = new CornerRadius(10);
+                    GlowBorder.CornerRadius = new CornerRadius(10);
+                    NormalViewGrid.Visibility = Visibility.Visible;
+                    CompactViewGrid.Visibility = Visibility.Collapsed;
+                    StatusBar.Visibility = Visibility.Visible;
+                    break;
             }
         }
 
@@ -120,6 +218,9 @@ namespace NotifyMe.UI
             });
         }
 
+        private long _initialBytesReceived = -1;
+        private long _initialBytesSent = -1;
+
         private void Timer_Tick(object? sender, EventArgs e)
         {
             bool isConnected = _networkMonitor?.IsConnected ?? false;
@@ -131,6 +232,13 @@ namespace NotifyMe.UI
                 SetStatusColor(Colors.Red);
                 DownloadText.Text = "--";
                 UploadText.Text = "--";
+                TotalSpeedText.Text = "--";
+                
+                TooltipNetworkName.Text = "Disconnected";
+                TooltipIPAddress.Text = "N/A";
+                
+                // Update Chart with zero
+                UpdateChart(0, 0);
             }
             else
             {
@@ -152,8 +260,42 @@ namespace NotifyMe.UI
                 {
                     DownloadText.Text = $"{FormatSpeed(stats.DownloadSpeedBytesPerSecond)}";
                     UploadText.Text = $"{FormatSpeed(stats.UploadSpeedBytesPerSecond)}";
+                    
+                    // Update Compact View
+                    double totalSpeed = stats.DownloadSpeedBytesPerSecond + stats.UploadSpeedBytesPerSecond;
+                    TotalSpeedText.Text = FormatSpeed(totalSpeed);
+                    
+                    // Update Tooltip
+                    TooltipNetworkName.Text = stats.InterfaceName;
+                    TooltipIPAddress.Text = stats.IPv4Address;
+                    
+                    // Initialize session counters if needed
+                    if (_initialBytesReceived == -1) _initialBytesReceived = stats.TotalBytesReceived;
+                    if (_initialBytesSent == -1) _initialBytesSent = stats.TotalBytesSent;
+                    
+                    // Calculate session usage
+                    long sessionDownload = Math.Max(0, stats.TotalBytesReceived - _initialBytesReceived);
+                    long sessionUpload = Math.Max(0, stats.TotalBytesSent - _initialBytesSent);
+                    
+                    TooltipSessionDownload.Text = NetworkStats.FormatBytes(sessionDownload);
+                    TooltipSessionUpload.Text = NetworkStats.FormatBytes(sessionUpload);
+                    
+                    // Update Chart
+                    if (MiniChart.Visibility == Visibility.Visible)
+                    {
+                        UpdateChart(stats.DownloadSpeedBytesPerSecond, stats.UploadSpeedBytesPerSecond);
+                    }
                 }
             }
+        }
+        
+        private void UpdateChart(double download, double upload)
+        {
+            _downloadValues.Add(download);
+            _uploadValues.Add(upload);
+            
+            if (_downloadValues.Count > 20) _downloadValues.RemoveAt(0);
+            if (_uploadValues.Count > 20) _uploadValues.RemoveAt(0);
         }
 
         private void SetStatusColor(Color color)
@@ -216,6 +358,33 @@ namespace NotifyMe.UI
             Hide();
         }
 
+        private void MenuItem_ShowMiniChart_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.MenuItem menuItem)
+            {
+                var settings = _settingsService.CurrentSettings;
+                settings.ShowMiniChart = menuItem.IsChecked;
+                _settingsService.SaveSettings(settings);
+                
+                // Apply immediately
+                ApplySettings(settings);
+            }
+        }
+
+        private void MenuItem_Shape_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.MenuItem menuItem && menuItem.Tag is string tag)
+            {
+                var shape = tag.Replace("Shape_", "");
+                var settings = _settingsService.CurrentSettings;
+                settings.FloatingWidgetShape = shape;
+                _settingsService.SaveSettings(settings);
+                
+                // Apply immediately
+                ApplySettings(settings);
+            }
+        }
+
         private void MenuItem_Settings_Click(object sender, RoutedEventArgs e)
         {
             _openSettingsAction?.Invoke();
@@ -228,9 +397,33 @@ namespace NotifyMe.UI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            var settings = _settingsService.CurrentSettings;
             var workArea = SystemParameters.WorkArea;
-            Left = workArea.Right - Width - 20;
-            Top = workArea.Bottom - Height - 20;
+            
+            // Use saved position if available, otherwise default to bottom-right
+            if (settings.FloatingWidgetLeft >= 0 && settings.FloatingWidgetTop >= 0)
+            {
+                // Ensure position is still within screen bounds
+                Left = Math.Max(0, Math.Min(settings.FloatingWidgetLeft, workArea.Right - Width));
+                Top = Math.Max(0, Math.Min(settings.FloatingWidgetTop, workArea.Bottom - Height));
+            }
+            else
+            {
+                // Default position: bottom-right
+                Left = workArea.Right - Width - 20;
+                Top = workArea.Bottom - Height - 20;
+            }
+        }
+        
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            // Save current position
+            var settings = _settingsService.CurrentSettings;
+            settings.FloatingWidgetLeft = Left;
+            settings.FloatingWidgetTop = Top;
+            _settingsService.SaveSettings(settings);
+            
+            base.OnClosing(e);
         }
     }
 }
