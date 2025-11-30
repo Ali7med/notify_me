@@ -113,11 +113,11 @@
 
         <Grid.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="Open NotifyMe" Click="MenuItem_Open_Click" FontWeight="Bold"/>
+                <MenuItem Header="Open NotifyMe" Click="MenuItem_Open_Click" FontWeight="Bold" Tag="OpenNotifyMe"/>
                 <Separator/>
-                <MenuItem Header="Settings" Click="MenuItem_Settings_Click"/>
-                <MenuItem Header="Hide Widget" Click="MenuItem_Hide_Click"/>
-                <MenuItem Header="Exit Application" Click="MenuItem_Exit_Click"/>
+                <MenuItem Header="Settings" Click="MenuItem_Settings_Click" Tag="Settings"/>
+                <MenuItem Header="Hide Widget" Click="MenuItem_Hide_Click" Tag="HideWidget"/>
+                <MenuItem Header="Exit Application" Click="MenuItem_Exit_Click" Tag="ExitApplication"/>
             </ContextMenu>
         </Grid.ContextMenu>
     </Grid>

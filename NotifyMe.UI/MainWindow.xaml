@@ -29,7 +29,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" 
+        <TextBlock x:Name="HeaderTitle" Grid.Row="0" 
                    Text="Network Monitor" 
                    FontSize="28" 
                    FontWeight="Bold"
@@ -40,7 +40,7 @@
                 Background="#2D2D30" 
                 Margin="0,0,0,15">
             <StackPanel>
-                <TextBlock Text="Connection Status" 
+                <TextBlock x:Name="LblConnectionStatus" Text="Connection Status" 
                           FontSize="16" 
                           FontWeight="SemiBold"
                           Margin="0,0,0,10"/>
@@ -66,43 +66,21 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Download Stats -->
-            <Border Grid.Column="0" Background="#2D2D30">
+            <!-- Download -->
+            <Border Grid.Column="0" Background="#2D2D30" Padding="15" CornerRadius="5">
                 <StackPanel>
-                    <TextBlock Text="↓ Download" 
-                              FontSize="16" 
-                              FontWeight="SemiBold"
-                              Margin="0,0,0,15"/>
-                    <TextBlock x:Name="DownloadSpeed" 
-                              Text="0 B/s" 
-                              FontSize="32"
-                              FontWeight="Bold"
-                              Foreground="#4EC9B0"
-                              Margin="0,0,0,10"/>
-                    <TextBlock x:Name="TotalDownload" 
-                              Text="Total: 0 B" 
-                              FontSize="12"
-                              Foreground="#808080"/>
+                    <TextBlock x:Name="LblDownload" Text="Download Speed" FontSize="14" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                    <TextBlock x:Name="DownloadSpeed" Text="0 KB/s" FontSize="24" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock x:Name="TotalDownload" Text="Total: 0 B" FontSize="12" Foreground="#808080"/>
                 </StackPanel>
             </Border>
 
-            <!-- Upload Stats -->
-            <Border Grid.Column="2" Background="#2D2D30">
+            <!-- Upload -->
+            <Border Grid.Column="2" Background="#2D2D30" Padding="15" CornerRadius="5">
                 <StackPanel>
-                    <TextBlock Text="↑ Upload" 
-                              FontSize="16" 
-                              FontWeight="SemiBold"
-                              Margin="0,0,0,15"/>
-                    <TextBlock x:Name="UploadSpeed" 
-                              Text="0 B/s" 
-                              FontSize="32"
-                              FontWeight="Bold"
-                              Foreground="#CE9178"
-                              Margin="0,0,0,10"/>
-                    <TextBlock x:Name="TotalUpload" 
-                              Text="Total: 0 B" 
-                              FontSize="12"
-                              Foreground="#808080"/>
+                    <TextBlock x:Name="LblUpload" Text="Upload Speed" FontSize="14" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                    <TextBlock x:Name="UploadSpeed" Text="0 KB/s" FontSize="24" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock x:Name="TotalUpload" Text="Total: 0 B" FontSize="12" Foreground="#808080"/>
                 </StackPanel>
             </Border>
         </Grid>
@@ -118,7 +96,7 @@
                       Foreground="#808080"
                       VerticalAlignment="Center"
                       Margin="0,0,15,0"/>
-            <Button Content="Minimize to Tray" 
+            <Button x:Name="BtnMinimize" Content="Minimize to Tray" 
                     Click="MinimizeToTray_Click"
                     Padding="15,8"
                     Background="#007ACC"

@@ -43,6 +43,9 @@ public partial class App : Application
             currentSettings.StartWithWindows = actualState;
             _settingsService.SaveSettings(currentSettings);
         }
+
+        // Apply saved language
+        Helpers.LocalizationManager.LoadLanguage(currentSettings.Language);
         
         // Initialize DataLogger with error handling
         try
@@ -78,23 +81,69 @@ public partial class App : Application
         _floatingIcon = new FloatingIconWindow(_networkMonitor, _trafficMonitor, _settingsService, ShowMainWindow, ShowSettingsWindow);
         _floatingIcon.Show();
 
-        // Update tray icon tooltip
+        // Update tray icon tooltip and menu translations
         UpdateTrayIcon();
+        UpdateContextMenuTranslations();
+    }
+    
+    private void UpdateContextMenuTranslations()
+    {
+        var lang = Helpers.LocalizationManager.Current;
+        
+        // Get the taskbar icon
+        var notifyIcon = this.FindResource("NotifyIcon") as Hardcodet.Wpf.TaskbarNotification.TaskbarIcon;
+        if (notifyIcon?.ContextMenu != null)
+        {
+            // Update each menu item
+            foreach (var item in notifyIcon.ContextMenu.Items)
+            {
+                if (item is System.Windows.Controls.MenuItem menuItem)
+                {
+                    // Use Tag to identify which translation to use
+                    switch (menuItem.Tag?.ToString())
+                    {
+                        case "ShowStatistics":
+                            menuItem.Header = lang.ContextMenu.ShowStatistics;
+                            break;
+                        case "ShowWidget":
+                            menuItem.Header = lang.ContextMenu.ShowWidget;
+                            break;
+                        case "ViewHistory":
+                            menuItem.Header = lang.ContextMenu.ViewHistory;
+                            break;
+                        case "Settings":
+                            menuItem.Header = lang.ContextMenu.Settings;
+                            break;
+                        case "ConnectionStatus":
+                            menuItem.Header = lang.ContextMenu.ConnectionStatus;
+                            break;
+                        case "TrafficMonitor":
+                            menuItem.Header = lang.ContextMenu.TrafficMonitor;
+                            break;
+                        case "Exit":
+                            menuItem.Header = lang.ContextMenu.Exit;
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionEvent e)
     {
         Dispatcher.Invoke(() =>
         {
+            bool isDnd = _notificationService?.IsDNDActive() ?? false;
+
             if (e.EventType == ConnectionEventType.Disconnected)
             {
                 _notificationService?.ShowConnectionLost();
-                _soundService?.PlayConnectionLost();
+                if (!isDnd) _soundService?.PlayConnectionLost();
             }
             else if (e.EventType == ConnectionEventType.Connected)
             {
                 _notificationService?.ShowConnectionRestored();
-                _soundService?.PlayConnectionRestored();
+                if (!isDnd) _soundService?.PlayConnectionRestored();
             }
 
             UpdateTrayIcon();

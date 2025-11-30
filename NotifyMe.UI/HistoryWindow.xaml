@@ -32,7 +32,7 @@
 
             <!-- Header -->
             <Grid Grid.Row="0" Margin="20,15">
-                <TextBlock Text="Network History" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                <TextBlock x:Name="HeaderTitle" Text="Network History" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" 
                         Background="Transparent" Foreground="{StaticResource TextSecondary}"
                         Click="CloseButton_Click" Margin="0,-5,-10,0" 
@@ -41,15 +41,15 @@
 
             <!-- Filters -->
             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,20,10">
-                <TextBlock Text="Date Range:" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="LblDateRange" Text="Date Range:" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <ComboBox x:Name="DateRangeComboBox" Width="150" Height="30" SelectionChanged="DateRangeComboBox_SelectionChanged">
-                    <ComboBoxItem Content="Last Hour" IsSelected="True"/>
-                    <ComboBoxItem Content="Last 24 Hours"/>
-                    <ComboBoxItem Content="Last 7 Days"/>
-                    <ComboBoxItem Content="Last 30 Days"/>
-                    <ComboBoxItem Content="All Time"/>
+                    <ComboBoxItem Content="Last Hour" Tag="LastHour" IsSelected="True"/>
+                    <ComboBoxItem Content="Last 24 Hours" Tag="Last24Hours"/>
+                    <ComboBoxItem Content="Last 7 Days" Tag="Last7Days"/>
+                    <ComboBoxItem Content="Last 30 Days" Tag="Last30Days"/>
+                    <ComboBoxItem Content="All Time" Tag="AllTime"/>
                 </ComboBox>
-                <Button Content="Refresh" Click="RefreshButton_Click" Margin="10,0,0,0" Padding="15,5" Background="{StaticResource AccentColor}" Foreground="#1E1E1E" BorderThickness="0" Cursor="Hand"/>
+                <Button x:Name="BtnRefresh" Content="Refresh" Click="RefreshButton_Click" Margin="10,0,0,0" Padding="15,5" Background="{StaticResource AccentColor}" Foreground="#1E1E1E" BorderThickness="0" Cursor="Hand"/>
                 <TextBlock x:Name="RecordCountText" Text="0 records" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="15,0,0,0"/>
             </StackPanel>
 
@@ -61,12 +61,12 @@
                       HeadersVisibility="Column" CanUserResizeRows="False"
                       AlternatingRowBackground="#252525">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" Width="100"/>
-                    <DataGridTextColumn Header="Date" Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd}}" Width="120"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="100"/>
-                    <DataGridTextColumn Header="Download" Binding="{Binding DownloadSpeedFormatted}" Width="120"/>
-                    <DataGridTextColumn Header="Upload" Binding="{Binding UploadSpeedFormatted}" Width="120"/>
-                    <DataGridTextColumn Header="Ping (ms)" Binding="{Binding LatencyText}" Width="100"/>
+                    <DataGridTextColumn x:Name="ColTime" Header="Time" Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" Width="100"/>
+                    <DataGridTextColumn x:Name="ColDate" Header="Date" Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd}}" Width="120"/>
+                    <DataGridTextColumn x:Name="ColStatus" Header="Status" Binding="{Binding StatusText}" Width="100"/>
+                    <DataGridTextColumn x:Name="ColDownload" Header="Download" Binding="{Binding DownloadSpeedFormatted}" Width="120"/>
+                    <DataGridTextColumn x:Name="ColUpload" Header="Upload" Binding="{Binding UploadSpeedFormatted}" Width="120"/>
+                    <DataGridTextColumn x:Name="ColPing" Header="Ping (ms)" Binding="{Binding LatencyText}" Width="100"/>
                 </DataGrid.Columns>
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
@@ -93,7 +93,7 @@
 
             <!-- Footer -->
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
-                <Button Content="Clear Old Logs (30+ days)" Click="ClearOldLogs_Click" Padding="15,8" Background="#555555" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Cursor="Hand"/>
+                <Button x:Name="BtnClear" Content="Clear Old Logs (30+ days)" Click="ClearOldLogs_Click" Padding="15,8" Background="#555555" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Cursor="Hand"/>
             </StackPanel>
         </Grid>
     </Border>

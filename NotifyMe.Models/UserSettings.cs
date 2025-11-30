@@ -18,4 +18,13 @@ public class UserSettings
     // Notification Settings
     public string NotificationType { get; set; } = "Toast"; // "Toast" or "Custom"
     public string CustomNotificationPosition { get; set; } = "TopRight"; // TopRight, TopLeft, BottomRight, BottomLeft
+
+    // Do Not Disturb Settings
+    public bool EnableDND { get; set; } = false;
+    public bool EnableDNDSchedule { get; set; } = false;
+    public TimeSpan DNDStartTime { get; set; } = new TimeSpan(22, 0, 0); // 10:00 PM
+    public TimeSpan DNDEndTime { get; set; } = new TimeSpan(7, 0, 0);   // 7:00 AM
+
+    // Localization Settings
+    public string Language { get; set; } = "ar"; // "ar" (Arabic) or "en" (English)
 }

@@ -36,6 +36,42 @@ namespace NotifyMe.UI
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(_settingsService.CurrentSettings.UpdateIntervalSeconds) };
             _timer.Tick += Timer_Tick;
             _timer.Start();
+            
+            // Apply context menu translations
+            UpdateContextMenuTranslations();
+            Helpers.LocalizationManager.LanguageChanged += (s, e) => Dispatcher.Invoke(UpdateContextMenuTranslations);
+        }
+        
+        private void UpdateContextMenuTranslations()
+        {
+            var lang = Helpers.LocalizationManager.Current;
+            
+            // Access the Grid's ContextMenu
+            var grid = this.Content as System.Windows.Controls.Grid;
+            if (grid?.ContextMenu != null)
+            {
+                foreach (var item in grid.ContextMenu.Items)
+                {
+                    if (item is System.Windows.Controls.MenuItem menuItem)
+                    {
+                        switch (menuItem.Tag?.ToString())
+                        {
+                            case "OpenNotifyMe":
+                                menuItem.Header = lang.FloatingWidget.OpenNotifyMe;
+                                break;
+                            case "Settings":
+                                menuItem.Header = lang.FloatingWidget.Settings;
+                                break;
+                            case "HideWidget":
+                                menuItem.Header = lang.FloatingWidget.HideWidget;
+                                break;
+                            case "ExitApplication":
+                                menuItem.Header = lang.FloatingWidget.ExitApplication;
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         private void ApplySettings(UserSettings settings)

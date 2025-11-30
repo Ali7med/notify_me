@@ -17,13 +17,64 @@ namespace NotifyMe.UI
         {
             InitializeComponent();
             _dataLogger = dataLogger;
+            
+            // Apply initial translations and subscribe to changes
+            ApplyTranslations();
+            Helpers.LocalizationManager.LanguageChanged += (s, e) => 
+            {
+                ApplyTranslations();
+                LoadData(); // Reload data to update localized status text
+            };
+            
             LoadData();
+        }
+
+        private void ApplyTranslations()
+        {
+            var lang = Helpers.LocalizationManager.CurrentLanguage;
+            
+            // Window Title & Header
+            Title = lang.History.Title;
+            if (HeaderTitle != null) HeaderTitle.Text = lang.History.HeaderTitle;
+            
+            // Labels & Buttons
+            if (LblDateRange != null) LblDateRange.Text = lang.History.DateRange;
+            if (BtnRefresh != null) BtnRefresh.Content = lang.History.Refresh;
+            if (BtnClear != null) BtnClear.Content = lang.History.ClearLogs;
+
+            // DataGrid Columns
+            if (ColTime != null) ColTime.Header = lang.History.ColTime;
+            if (ColDate != null) ColDate.Header = lang.History.ColDate;
+            if (ColStatus != null) ColStatus.Header = lang.History.ColStatus;
+            if (ColDownload != null) ColDownload.Header = lang.History.ColDownload;
+            if (ColUpload != null) ColUpload.Header = lang.History.ColUpload;
+            if (ColPing != null) ColPing.Header = lang.History.ColPing;
+
+            // ComboBox Items
+            if (DateRangeComboBox != null)
+            {
+                foreach (ComboBoxItem item in DateRangeComboBox.Items)
+                {
+                    switch (item.Tag?.ToString())
+                    {
+                        case "LastHour": item.Content = lang.History.RangeLastHour; break;
+                        case "Last24Hours": item.Content = lang.History.RangeLast24Hours; break;
+                        case "Last7Days": item.Content = lang.History.RangeLast7Days; break;
+                        case "Last30Days": item.Content = lang.History.RangeLast30Days; break;
+                        case "AllTime": item.Content = lang.History.RangeAllTime; break;
+                    }
+                }
+            }
+
+            // Handle RTL/LTR
+            FlowDirection = lang.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
         }
 
         private void LoadData()
         {
             try
             {
+                var lang = Helpers.LocalizationManager.CurrentLanguage;
                 var range = GetDateRange();
                 var logs = _dataLogger.GetLogs(range.from, range.to);
                 
@@ -31,14 +82,15 @@ namespace NotifyMe.UI
                 var displayData = logs.Select(log => new NetworkLogDisplay
                 {
                     Timestamp = log.Timestamp,
-                    StatusText = log.IsConnected ? "Connected" : "Disconnected",
+                    StatusText = log.IsConnected ? lang.MainWindow.Connected : lang.MainWindow.Disconnected,
                     DownloadSpeedFormatted = FormatSpeed(log.DownloadSpeedBps),
                     UploadSpeedFormatted = FormatSpeed(log.UploadSpeedBps),
                     LatencyText = log.Latency < 0 ? "TIMEOUT" : $"{log.Latency}"
                 }).ToList();
 
                 HistoryDataGrid.ItemsSource = displayData;
-                RecordCountText.Text = $"{displayData.Count} records";
+                if (RecordCountText != null)
+                    RecordCountText.Text = string.Format(lang.History.RecordsFormat, displayData.Count);
             }
             catch (Exception ex)
             {

@@ -36,6 +36,35 @@ public partial class MainWindow : Window
             _trafficMonitor.TrafficUpdated += OnTrafficUpdated;
             UpdateTrafficStats(_trafficMonitor.CurrentStats);
         }
+
+        // Apply initial translations and subscribe to changes
+        ApplyTranslations();
+        Helpers.LocalizationManager.LanguageChanged += (s, e) => ApplyTranslations();
+    }
+
+    private void ApplyTranslations()
+    {
+        var lang = Helpers.LocalizationManager.CurrentLanguage;
+        
+        // Window Title & Header
+        Title = lang.MainWindow.Title;
+        if (HeaderTitle != null) HeaderTitle.Text = lang.MainWindow.HeaderTitle;
+        
+        // Labels
+        if (LblConnectionStatus != null) LblConnectionStatus.Text = lang.MainWindow.ConnectionStatus;
+        if (LblDownload != null) LblDownload.Text = lang.MainWindow.DownloadSpeed;
+        if (LblUpload != null) LblUpload.Text = lang.MainWindow.UploadSpeed;
+        if (BtnMinimize != null) BtnMinimize.Content = lang.MainWindow.MinimizeButton;
+
+        // Update dynamic text if we have current state
+        if (_networkMonitor != null)
+            UpdateConnectionStatus(_networkMonitor.IsConnected);
+            
+        if (_trafficMonitor != null)
+            UpdateTrafficStats(_trafficMonitor.CurrentStats);
+
+        // Handle RTL/LTR
+        FlowDirection = lang.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionEvent e)
@@ -56,17 +85,19 @@ public partial class MainWindow : Window
 
     private void UpdateConnectionStatus(bool isConnected)
     {
-        StatusText.Text = isConnected ? "Connected" : "Disconnected";
+        var lang = Helpers.LocalizationManager.CurrentLanguage;
+        StatusText.Text = isConnected ? lang.MainWindow.Connected : lang.MainWindow.Disconnected;
         StatusIndicator.Fill = new SolidColorBrush(isConnected ? Colors.Lime : Colors.Red);
     }
 
     private void UpdateTrafficStats(NetworkStats stats)
     {
+        var lang = Helpers.LocalizationManager.CurrentLanguage;
         DownloadSpeed.Text = stats.DownloadSpeedFormatted;
         UploadSpeed.Text = stats.UploadSpeedFormatted;
-        TotalDownload.Text = $"Total: {NetworkStats.FormatBytes(stats.TotalBytesReceived)}";
-        TotalUpload.Text = $"Total: {NetworkStats.FormatBytes(stats.TotalBytesSent)}";
-        LastUpdate.Text = $"Last update: {stats.Timestamp:HH:mm:ss}";
+        TotalDownload.Text = $"{lang.MainWindow.TotalPrefix}{NetworkStats.FormatBytes(stats.TotalBytesReceived)}";
+        TotalUpload.Text = $"{lang.MainWindow.TotalPrefix}{NetworkStats.FormatBytes(stats.TotalBytesSent)}";
+        LastUpdate.Text = $"{lang.MainWindow.LastUpdatePrefix}{stats.Timestamp:HH:mm:ss}";
     }
 
     private void MinimizeToTray_Click(object sender, RoutedEventArgs e)

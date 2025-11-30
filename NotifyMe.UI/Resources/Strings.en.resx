@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Main Window -->
+  <data name="MainWindow_Title" xml:space="preserve">
+    <value>NotifyMe - Network Monitor</value>
+  </data>
+  <data name="MainWindow_Statistics" xml:space="preserve">
+    <value>📊 Network Statistics</value>
+  </data>
+  <data name="MainWindow_Status" xml:space="preserve">
+    <value>Connection Status</value>
+  </data>
+  <data name="MainWindow_Connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="MainWindow_Disconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="MainWindow_Download" xml:space="preserve">
+    <value>Download Speed</value>
+  </data>
+  <data name="MainWindow_Upload" xml:space="preserve">
+    <value>Upload Speed</value>
+  </data>
+  <data name="MainWindow_Latency" xml:space="preserve">
+    <value>Latency (Ping)</value>
+  </data>
+  
+  <!-- Settings Window -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>⚙️ Settings</value>
+  </data>
+  <data name="Settings_Subtitle" xml:space="preserve">
+    <value>Customize your NotifyMe experience</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>🎨 Appearance</value>
+  </data>
+  <data name="Settings_Network" xml:space="preserve">
+    <value>🌐 Network</value>
+  </data>
+  <data name="Settings_Notifications" xml:space="preserve">
+    <value>🔔 Notifications</value>
+  </data>
+  <data name="Settings_Advanced" xml:space="preserve">
+    <value>⚙️ Advanced</value>
+  </data>
+  <data name="Settings_SaveChanges" xml:space="preserve">
+    <value>💾 Save Changes</value>
+  </data>
+  
+  <!-- Appearance Tab -->
+  <data name="Appearance_Transparency" xml:space="preserve">
+    <value>Widget Transparency</value>
+  </data>
+  <data name="Appearance_TransparencyDesc" xml:space="preserve">
+    <value>Adjust how transparent the floating widget appears</value>
+  </data>
+  <data name="Appearance_Theme" xml:space="preserve">
+    <value>Theme Style</value>
+  </data>
+  <data name="Appearance_ThemeDesc" xml:space="preserve">
+    <value>Choose your preferred visual style</value>
+  </data>
+  <data name="Appearance_GlassTheme" xml:space="preserve">
+    <value>✨ Glass (Modern &amp; Transparent)</value>
+  </data>
+  <data name="Appearance_ClassicTheme" xml:space="preserve">
+    <value>⬛ Classic (Solid Background)</value>
+  </data>
+  
+  <!-- Network Tab -->
+  <data name="Network_PingHost" xml:space="preserve">
+    <value>Connectivity Test Server</value>
+  </data>
+  <data name="Network_PingHostDesc" xml:space="preserve">
+    <value>IP address used to check internet connectivity (e.g., 8.8.8.8, 1.1.1.1)</value>
+  </data>
+  <data name="Network_QuickSelect" xml:space="preserve">
+    <value>Quick Select</value>
+  </data>
+  
+  <!-- Notifications Tab -->
+  <data name="Notifications_AlertPreferences" xml:space="preserve">
+    <value>Alert Preferences</value>
+  </data>
+  <data name="Notifications_Type" xml:space="preserve">
+    <value>Notification Type</value>
+  </data>
+  <data name="Notifications_WindowsToast" xml:space="preserve">
+    <value>🪟 Windows Toast Notifications</value>
+  </data>
+  <data name="Notifications_WindowsToastDesc" xml:space="preserve">
+    <value>Use built-in Windows notifications (shows in Action Center)</value>
+  </data>
+  <data name="Notifications_Custom" xml:space="preserve">
+    <value>✨ Custom Notifications</value>
+  </data>
+  <data name="Notifications_CustomDesc" xml:space="preserve">
+    <value>Use custom notification window with configurable position</value>
+  </data>
+  <data name="Notifications_Position" xml:space="preserve">
+    <value>Notification Position</value>
+  </data>
+  <data name="Notifications_ShowToast" xml:space="preserve">
+    <value>📢 Show Toast Notifications</value>
+  </data>
+  <data name="Notifications_ShowToastDesc" xml:space="preserve">
+    <value>Display popup notifications when internet connection changes</value>
+  </data>
+  <data name="Notifications_PlaySound" xml:space="preserve">
+    <value>🔊 Play Sound Alerts</value>
+  </data>
+  <data name="Notifications_PlaySoundDesc" xml:space="preserve">
+    <value>Play audio when connection is lost or restored</value>
+  </data>
+  <data name="Notifications_DND" xml:space="preserve">
+    <value>Do Not Disturb</value>
+  </data>
+  <data name="Notifications_DNDNow" xml:space="preserve">
+    <value>🌙 Do Not Disturb Now</value>
+  </data>
+  <data name="Notifications_DNDNowDesc" xml:space="preserve">
+    <value>Silence all notifications immediately</value>
+  </data>
+  <data name="Notifications_DNDSchedule" xml:space="preserve">
+    <value>📅 Scheduled DND</value>
+  </data>
+  <data name="Notifications_DNDScheduleDesc" xml:space="preserve">
+    <value>Automatically silence notifications during specific hours</value>
+  </data>
+  <data name="Notifications_StartTime" xml:space="preserve">
+    <value>Start Time:</value>
+  </data>
+  <data name="Notifications_EndTime" xml:space="preserve">
+    <value>End Time:</value>
+  </data>
+  <data name="Notifications_Tip" xml:space="preserve">
+    <value>💡 Tip</value>
+  </data>
+  <data name="Notifications_TipText" xml:space="preserve">
+    <value>You can enable both, one, or neither option based on your preference. Toast notifications show detailed info, while sounds provide quick audio feedback.</value>
+  </data>
+  
+  <!-- Advanced Tab -->
+  <data name="Advanced_UpdateFrequency" xml:space="preserve">
+    <value>Update Frequency</value>
+  </data>
+  <data name="Advanced_UpdateFrequencyDesc" xml:space="preserve">
+    <value>How often the widget updates network statistics (lower = more responsive, higher = less CPU usage)</value>
+  </data>
+  <data name="Advanced_TrafficThreshold" xml:space="preserve">
+    <value>High Traffic Alert Threshold</value>
+  </data>
+  <data name="Advanced_TrafficThresholdDesc" xml:space="preserve">
+    <value>Threshold for considering traffic as 'high' (shows alert when exceeded)</value>
+  </data>
+  <data name="Advanced_StartupBehavior" xml:space="preserve">
+    <value>Startup Behavior</value>
+  </data>
+  <data name="Advanced_StartWithWindows" xml:space="preserve">
+    <value>🚀 Start with Windows</value>
+  </data>
+  <data name="Advanced_StartWithWindowsDesc" xml:space="preserve">
+    <value>Automatically launch NotifyMe when Windows starts</value>
+  </data>
+  <data name="Advanced_Language" xml:space="preserve">
+    <value>Language / اللغة</value>
+  </data>
+  <data name="Advanced_LanguageDesc" xml:space="preserve">
+    <value>Select your preferred interface language</value>
+  </data>
+  
+  <!-- Taskbar Menu -->
+  <data name="Taskbar_ShowStatistics" xml:space="preserve">
+    <value>Show Statistics</value>
+  </data>
+  <data name="Taskbar_ShowWidget" xml:space="preserve">
+    <value>Show Widget</value>
+  </data>
+  <data name="Taskbar_ViewHistory" xml:space="preserve">
+    <value>View History</value>
+  </data>
+  <data name="Taskbar_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Taskbar_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  
+  <!-- History Window -->
+  <data name="History_Title" xml:space="preserve">
+    <value>📊 Network History</value>
+  </data>
+  <data name="History_Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="History_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="History_Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="History_Upload" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="History_Ping" xml:space="preserve">
+    <value>Ping</value>
+  </data>
+  <data name="History_Refresh" xml:space="preserve">
+    <value>🔄 Refresh</value>
+  </data>
+  <data name="History_DeleteOld" xml:space="preserve">
+    <value>🗑️ Delete Old Records</value>
+  </data>
+  <data name="History_Filter" xml:space="preserve">
+    <value>Filter:</value>
+  </data>
+  <data name="History_LastHour" xml:space="preserve">
+    <value>Last Hour</value>
+  </data>
+  <data name="History_Last24Hours" xml:space="preserve">
+    <value>Last 24 Hours</value>
+  </data>
+  <data name="History_Last7Days" xml:space="preserve">
+    <value>Last 7 Days</value>
+  </data>
+  <data name="History_Last30Days" xml:space="preserve">
+    <value>Last 30 Days</value>
+  </data>
+  <data name="History_AllRecords" xml:space="preserve">
+    <value>All Records</value>
+  </data>
+  
+  <!-- Notifications -->
+  <data name="Notification_ConnectionLost" xml:space="preserve">
+    <value>Internet Connection Lost</value>
+  </data>
+  <data name="Notification_ConnectionRestored" xml:space="preserve">
+    <value>Internet Connection Restored</value>
+  </data>
+  <data name="Notification_HighTraffic" xml:space="preserve">
+    <value>High Traffic Alert</value>
+  </data>
+  <data name="Notification_TrafficExceeded" xml:space="preserve">
+    <value>Traffic exceeded {0} {1}/s</value>
+  </data>
+  <data name="Notification_CurrentSpeed" xml:space="preserve">
+    <value>Current speed: {0}</value>
+  </data>
+  <data name="Notification_ConnectionLostAt" xml:space="preserve">
+    <value>Connection lost at {0}</value>
+  </data>
+  <data name="Notification_ConnectionRestoredAt" xml:space="preserve">
+    <value>Connection restored at {0}</value>
+  </data>
+</root>

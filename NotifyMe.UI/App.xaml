@@ -62,15 +62,15 @@
                             MenuActivation="RightClick">
                 <tb:TaskbarIcon.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Show Statistics" Click="ShowWindow_Click" FontWeight="Bold"/>
-                        <MenuItem Header="Show Widget" Click="ShowWidget_Click"/>
-                        <MenuItem Header="View History" Click="ShowHistory_Click"/>
-                        <MenuItem Header="Settings" Click="ShowSettings_Click"/>
+                        <MenuItem Header="Show Statistics" Click="ShowWindow_Click" FontWeight="Bold" Tag="ShowStatistics"/>
+                        <MenuItem Header="Show Widget" Click="ShowWidget_Click" Tag="ShowWidget"/>
+                        <MenuItem Header="View History" Click="ShowHistory_Click" Tag="ViewHistory"/>
+                        <MenuItem Header="Settings" Click="ShowSettings_Click" Tag="Settings"/>
                         <Separator/>
-                        <MenuItem Header="Connection Status" IsEnabled="False"/>
-                        <MenuItem Header="Traffic Monitor" IsEnabled="False"/>
+                        <MenuItem Header="Connection Status" IsEnabled="False" Tag="ConnectionStatus"/>
+                        <MenuItem Header="Traffic Monitor" IsEnabled="False" Tag="TrafficMonitor"/>
                         <Separator/>
-                        <MenuItem Header="Exit" Click="Exit_Click"/>
+                        <MenuItem Header="Exit" Click="Exit_Click" Tag="Exit"/>
                     </ContextMenu>
                 </tb:TaskbarIcon.ContextMenu>
             </tb:TaskbarIcon>

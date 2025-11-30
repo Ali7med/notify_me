@@ -15,12 +15,16 @@ public class NotificationService
 
     public void ShowConnectionLost()
     {
+        if (IsDNDActive()) return;
+
         var settings = _settingsService.CurrentSettings;
         if (!settings.EnableToastNotifications) return;
+        
+        var lang = Helpers.LocalizationManager.Current;
 
         if (settings.NotificationType == "Custom")
         {
-            ShowCustomNotification(Windows.NotificationType.Error, "Internet Connection Lost", 
+            ShowCustomNotification(Windows.NotificationType.Error, lang.Notifications.ConnectionLost, 
                 $"Connection lost at {DateTime.Now:HH:mm:ss}");
         }
         else
@@ -28,7 +32,7 @@ public class NotificationService
             try
             {
                 new ToastContentBuilder()
-                    .AddText("Internet Connection Lost")
+                    .AddText(lang.Notifications.ConnectionLost)
                     .AddText($"Connection lost at {DateTime.Now:HH:mm:ss}")
                     .AddAttributionText("NotifyMe")
                     .Show();
@@ -42,12 +46,16 @@ public class NotificationService
 
     public void ShowConnectionRestored()
     {
+        if (IsDNDActive()) return;
+
         var settings = _settingsService.CurrentSettings;
         if (!settings.EnableToastNotifications) return;
+        
+        var lang = Helpers.LocalizationManager.Current;
 
         if (settings.NotificationType == "Custom")
         {
-            ShowCustomNotification(Windows.NotificationType.Success, "Internet Connection Restored", 
+            ShowCustomNotification(Windows.NotificationType.Success, lang.Notifications.ConnectionRestored, 
                 $"Connection restored at {DateTime.Now:HH:mm:ss}");
         }
         else
@@ -55,7 +63,7 @@ public class NotificationService
             try
             {
                 new ToastContentBuilder()
-                    .AddText("Internet Connection Restored")
+                    .AddText(lang.Notifications.ConnectionRestored)
                     .AddText($"Connection restored at {DateTime.Now:HH:mm:ss}")
                     .AddAttributionText("NotifyMe")
                     .Show();
@@ -69,6 +77,7 @@ public class NotificationService
 
     public void ShowCustomNotification(string title, string message)
     {
+        if (IsDNDActive()) return;
         // Overload for generic usage, defaulting to info
         ShowCustomNotification(Windows.NotificationType.Info, title, message);
     }
@@ -85,6 +94,8 @@ public class NotificationService
 
     public void ShowHighTrafficAlert(double speedMBps, string unit, double threshold)
     {
+        if (IsDNDActive()) return;
+
         System.Diagnostics.Debug.WriteLine($"ShowHighTrafficAlert called: Speed={speedMBps:F2} MB/s, Unit={unit}, Threshold={threshold}");
         
         var settings = _settingsService.CurrentSettings;
@@ -110,8 +121,9 @@ public class NotificationService
 
         if (settings.NotificationType == "Custom")
         {
-            ShowCustomNotification(Windows.NotificationType.Warning, "High Traffic Alert", 
-                $"Traffic exceeded {threshold:F1} {unit}/s\nCurrent speed: {formattedSpeed}");
+            var lang = Helpers.LocalizationManager.Current;
+            ShowCustomNotification(Windows.NotificationType.Warning, lang.Notifications.HighTraffic, 
+                $"{string.Format(lang.Notifications.TrafficExceeded, threshold, unit)}\\n{string.Format(lang.Notifications.CurrentSpeed, formattedSpeed)}");
         }
         else
         {
@@ -119,10 +131,11 @@ public class NotificationService
             {
                 System.Diagnostics.Debug.WriteLine($"Displaying toast: {formattedSpeed}");
                 
+                var lang = Helpers.LocalizationManager.Current;
                 new ToastContentBuilder()
-                    .AddText("⚠️ High Traffic Alert")
-                    .AddText($"Traffic exceeded {threshold:F1} {unit}/s")
-                    .AddText($"Current speed: {formattedSpeed}")
+                    .AddText($"⚠️ {lang.Notifications.HighTraffic}")
+                    .AddText(string.Format(lang.Notifications.TrafficExceeded, threshold, unit))
+                    .AddText(string.Format(lang.Notifications.CurrentSpeed, formattedSpeed))
                     .AddAttributionText("NotifyMe")
                     .Show();
                     
@@ -133,5 +146,33 @@ public class NotificationService
                 System.Diagnostics.Debug.WriteLine($"Failed to show toast: {ex.Message}");
             }
         }
+    }
+
+    public bool IsDNDActive()
+    {
+        var settings = _settingsService.CurrentSettings;
+        
+        // Manual DND
+        if (settings.EnableDND) return true;
+
+        // Scheduled DND
+        if (settings.EnableDNDSchedule)
+        {
+            var now = DateTime.Now.TimeOfDay;
+            var start = settings.DNDStartTime;
+            var end = settings.DNDEndTime;
+
+            // Check if schedule crosses midnight (e.g., 22:00 to 07:00)
+            if (start > end)
+            {
+                return now >= start || now <= end;
+            }
+            else
+            {
+                return now >= start && now <= end;
+            }
+        }
+
+        return false;
     }
 }
