@@ -139,12 +139,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Title = lang.MainWindow.Title;
         if (PageTitle != null) PageTitle.Text = "Dashboard"; // TODO: Add to strings
         
-        // Stat Cards Titles
-        if (CardDownload != null) CardDownload.Title = lang.MainWindow.DownloadSpeed.ToUpper();
-        if (CardUpload != null) CardUpload.Title = lang.MainWindow.UploadSpeed.ToUpper();
-        if (CardPing != null) CardPing.Title = "PING";
-        if (CardUsage != null) CardUsage.Title = "USAGE";
-
         // Handle RTL/LTR
         FlowDirection = lang.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
     }
@@ -162,20 +156,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Dispatcher.Invoke(() =>
         {
-            if (CardPing != null)
+            if (LatencyText != null)
             {
                 if (latency < 0)
                 {
-                    CardPing.Value = "TIMEOUT";
-                    CardPing.IconForeground = Brushes.Red;
+                    LatencyText.Text = "TIMEOUT";
+                    LatencyText.Foreground = Brushes.Red;
                 }
                 else
                 {
-                    CardPing.Value = $"{latency} ms";
+                    LatencyText.Text = $"{latency} ms";
                     
-                    if (latency < 50) CardPing.IconForeground = Brushes.Green;
-                    else if (latency < 150) CardPing.IconForeground = Brushes.Orange;
-                    else CardPing.IconForeground = Brushes.Red;
+                    if (latency < 50) LatencyText.Foreground = Brushes.LimeGreen;
+                    else if (latency < 150) LatencyText.Foreground = Brushes.Orange;
+                    else LatencyText.Foreground = Brushes.Red;
                 }
             }
         });
@@ -192,23 +186,30 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateTrafficStats(NetworkStats stats)
     {
-        if (CardDownload != null)
+        if (DownloadSpeedText != null)
         {
-            CardDownload.Value = stats.DownloadSpeedFormatted;
-            CardDownload.Trend = $"Total: {NetworkStats.FormatBytes(stats.TotalBytesReceived)}";
+            DownloadSpeedText.Text = stats.DownloadSpeedFormatted;
         }
 
-        if (CardUpload != null)
+        if (UploadSpeedText != null)
         {
-            CardUpload.Value = stats.UploadSpeedFormatted;
-            CardUpload.Trend = $"Total: {NetworkStats.FormatBytes(stats.TotalBytesSent)}";
+            UploadSpeedText.Text = stats.UploadSpeedFormatted;
         }
-
-        if (CardUsage != null)
+        
+        // Update Signal Strength based on latency (simple heuristic)
+        if (SignalStrengthText != null)
         {
-            long total = stats.TotalBytesReceived + stats.TotalBytesSent;
-            CardUsage.Value = NetworkStats.FormatBytes(total);
-            CardUsage.Trend = "Session Total";
+            if (!_networkMonitor?.IsConnected ?? true)
+            {
+                SignalStrengthText.Text = "Disconnected";
+                SignalStrengthText.Foreground = Brushes.Red;
+            }
+            else
+            {
+                SignalStrengthText.Text = "Strong"; // Default
+                var brush = TryFindResource("PrimaryHueMidBrush") as Brush;
+                SignalStrengthText.Foreground = brush ?? Brushes.Purple;
+            }
         }
     }
     
