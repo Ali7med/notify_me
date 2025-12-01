@@ -21,6 +21,9 @@ public partial class App : Application
     private SoundService? _soundService;
     private AutoStartService? _autoStartService;
     private DataLogger? _dataLogger;
+    private ProcessMonitorService? _processMonitor;
+    private ApplicationsWindow? _applicationsWindow;
+    private AnalyticsWindow? _analyticsWindow;
     private readonly AppSettings _settings = new();
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -112,6 +115,10 @@ public partial class App : Application
         // Start monitoring
         _networkMonitor.Start();
         _trafficMonitor.Start();
+        
+        // Initialize and start process monitor
+        _processMonitor = new ProcessMonitorService();
+        _processMonitor.Start();
         
         // Apply sound settings
         if (_soundService != null)
@@ -337,6 +344,52 @@ public partial class App : Application
         }
     }
 
+    public void ShowApplicationsWindow()
+    {
+        try
+        {
+            if (_processMonitor == null)
+            {
+                MessageBox.Show("Process Monitor is not initialized.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (_applicationsWindow == null)
+            {
+                _applicationsWindow = new ApplicationsWindow(_processMonitor);
+                _applicationsWindow.Closed += (s, e) => _applicationsWindow = null;
+            }
+
+            _applicationsWindow.Show();
+            _applicationsWindow.WindowState = WindowState.Normal;
+            _applicationsWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Applications Window: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    public void ShowAnalyticsWindow()
+    {
+        try
+        {
+            if (_analyticsWindow == null)
+            {
+                _analyticsWindow = new AnalyticsWindow(_dataLogger);
+                _analyticsWindow.Closed += (s, e) => _analyticsWindow = null;
+            }
+
+            _analyticsWindow.Show();
+            _analyticsWindow.WindowState = WindowState.Normal;
+            _analyticsWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Analytics Window: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
     private void Exit_Click(object sender, RoutedEventArgs e)
     {
         Shutdown();
@@ -359,7 +412,7 @@ public partial class App : Application
         ShowHistoryWindow();
     }
     
-    private void ShowHistoryWindow()
+    public void ShowHistoryWindow()
     {
         if (_historyWindow == null || !_historyWindow.IsLoaded)
         {

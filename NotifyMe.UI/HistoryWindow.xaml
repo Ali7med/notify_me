@@ -1,100 +1,166 @@
 <Window x:Class="NotifyMe.UI.HistoryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Network History" Height="600" Width="900"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Network History - NotifyMe" 
+        Height="650" Width="1000"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResize"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
-        MouseDown="Window_MouseDown">
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+    
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-    <Window.Resources>
-        <!-- Colors -->
-        <SolidColorBrush x:Key="WindowBackground" Color="#1E1E1E"/>
-        <SolidColorBrush x:Key="AccentColor" Color="#4CC2FF"/>
-        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#AAAAAA"/>
-    </Window.Resources>
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Network History" FontSize="28" FontWeight="Bold"/>
+            <TextBlock Text="Complete log of your network activity" FontSize="14" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+        </StackPanel>
 
-    <Border Background="{StaticResource WindowBackground}" CornerRadius="10" BorderThickness="1" BorderBrush="#333333">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.5"/>
-        </Border.Effect>
+        <!-- Filters -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+            <ComboBox x:Name="DateRangeComboBox" 
+                     Width="180"
+                     materialDesign:HintAssist.Hint="Time Range"
+                     SelectionChanged="DateRangeComboBox_SelectionChanged"
+                     Style="{DynamicResource MaterialDesignOutlinedComboBox}">
+                <ComboBoxItem Content="Last Hour" Tag="LastHour"/>
+                <ComboBoxItem Content="Last 24 Hours" Tag="Last24Hours" IsSelected="True"/>
+                <ComboBoxItem Content="Last 7 Days" Tag="Last7Days"/>
+                <ComboBoxItem Content="Last 30 Days" Tag="Last30Days"/>
+                <ComboBoxItem Content="All Time" Tag="AllTime"/>
+            </ComboBox>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Header -->
-                <RowDefinition Height="Auto"/> <!-- Filters -->
-                <RowDefinition Height="*"/>    <!-- Data Grid -->
-                <RowDefinition Height="Auto"/> <!-- Footer -->
-            </Grid.RowDefinitions>
+            <Button x:Name="BtnRefresh" 
+                   Content="REFRESH" 
+                   Click="RefreshButton_Click" 
+                   Margin="15,0,0,0"
+                   Style="{DynamicResource MaterialDesignRaisedButton}"/>
 
-            <!-- Header -->
-            <Grid Grid.Row="0" Margin="20,15">
-                <TextBlock x:Name="HeaderTitle" Text="Network History" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                        Background="Transparent" Foreground="{StaticResource TextSecondary}"
-                        Click="CloseButton_Click" Margin="0,-5,-10,0" 
-                        BorderThickness="0" FontSize="16" Cursor="Hand"/>
-            </Grid>
+            <Button x:Name="BtnExport" 
+                   Content="EXPORT CSV" 
+                   Click="ExportButton_Click" 
+                   Margin="10,0,0,0"
+                   Style="{DynamicResource MaterialDesignOutlinedButton}"/>
+        </StackPanel>
 
-            <!-- Filters -->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,20,10">
-                <TextBlock x:Name="LblDateRange" Text="Date Range:" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <ComboBox x:Name="DateRangeComboBox" Width="150" Height="30" SelectionChanged="DateRangeComboBox_SelectionChanged">
-                    <ComboBoxItem Content="Last Hour" Tag="LastHour" IsSelected="True"/>
-                    <ComboBoxItem Content="Last 24 Hours" Tag="Last24Hours"/>
-                    <ComboBoxItem Content="Last 7 Days" Tag="Last7Days"/>
-                    <ComboBoxItem Content="Last 30 Days" Tag="Last30Days"/>
-                    <ComboBoxItem Content="All Time" Tag="AllTime"/>
-                </ComboBox>
-                <Button x:Name="BtnRefresh" Content="Refresh" Click="RefreshButton_Click" Margin="10,0,0,0" Padding="15,5" Background="{StaticResource AccentColor}" Foreground="#1E1E1E" BorderThickness="0" Cursor="Hand"/>
-                <TextBlock x:Name="RecordCountText" Text="0 records" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="15,0,0,0"/>
-            </StackPanel>
+        <!-- Statistics Summary -->
+        <Grid Grid.Row="2" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Data Grid -->
-            <DataGrid x:Name="HistoryDataGrid" Grid.Row="2" Margin="20,0,20,10"
-                      AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="#2D2D2D" Foreground="{StaticResource TextPrimary}"
-                      BorderThickness="0" GridLinesVisibility="Horizontal"
-                      HeadersVisibility="Column" CanUserResizeRows="False"
-                      AlternatingRowBackground="#252525">
-                <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="ColTime" Header="Time" Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" Width="100"/>
-                    <DataGridTextColumn x:Name="ColDate" Header="Date" Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd}}" Width="120"/>
-                    <DataGridTextColumn x:Name="ColStatus" Header="Status" Binding="{Binding StatusText}" Width="100"/>
-                    <DataGridTextColumn x:Name="ColDownload" Header="Download" Binding="{Binding DownloadSpeedFormatted}" Width="120"/>
-                    <DataGridTextColumn x:Name="ColUpload" Header="Upload" Binding="{Binding UploadSpeedFormatted}" Width="120"/>
-                    <DataGridTextColumn x:Name="ColPing" Header="Ping (ms)" Binding="{Binding LatencyText}" Width="100"/>
-                </DataGrid.Columns>
-                <DataGrid.ColumnHeaderStyle>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#333333"/>
-                        <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
-                        <Setter Property="FontWeight" Value="Bold"/>
-                        <Setter Property="Padding" Value="10,8"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
-                <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
-                        <Setter Property="Background" Value="#2D2D2D"/>
-                        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#3D3D3D"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.RowStyle>
-            </DataGrid>
+            <materialDesign:Card Grid.Column="0" Padding="15" Margin="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="TOTAL RECORDS" FontSize="10" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    <TextBlock x:Name="RecordCountText" Text="0" FontSize="22" FontWeight="Bold" Margin="0,5,0,0"/>
+                </StackPanel>
+            </materialDesign:Card>
 
-            <!-- Footer -->
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
-                <Button x:Name="BtnClear" Content="Clear Old Logs (30+ days)" Click="ClearOldLogs_Click" Padding="15,8" Background="#555555" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Cursor="Hand"/>
-            </StackPanel>
+            <materialDesign:Card Grid.Column="1" Padding="15" Margin="10,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="AVG DOWNLOAD" FontSize="10" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    <TextBlock x:Name="AvgDownloadText" Text="0 KB/s" FontSize="22" FontWeight="Bold" Margin="0,5,0,0" Foreground="#2196F3"/>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <materialDesign:Card Grid.Column="2" Padding="15" Margin="10,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="AVG UPLOAD" FontSize="10" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    <TextBlock x:Name="AvgUploadText" Text="0 KB/s" FontSize="22" FontWeight="Bold" Margin="0,5,0,0" Foreground="#4CAF50"/>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <materialDesign:Card Grid.Column="3" Padding="15" Margin="10,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="AVG PING" FontSize="10" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    <TextBlock x:Name="AvgPingText" Text="0 ms" FontSize="22" FontWeight="Bold" Margin="0,5,0,0" Foreground="#FF9800"/>
+                </StackPanel>
+            </materialDesign:Card>
         </Grid>
-    </Border>
+
+        <!-- Data Grid -->
+        <DataGrid x:Name="HistoryDataGrid" 
+                 Grid.Row="3"
+                 AutoGenerateColumns="False" 
+                 IsReadOnly="True"
+                 CanUserAddRows="False"
+                 CanUserDeleteRows="False"
+                 SelectionMode="Single"
+                 GridLinesVisibility="Horizontal"
+                 HeadersVisibility="Column"
+                 AlternatingRowBackground="{DynamicResource MaterialDesignDivider}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Time" 
+                                  Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" 
+                                  Width="Auto"/>
+                <DataGridTextColumn Header="Date" 
+                                  Binding="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd}}" 
+                                  Width="Auto"/>
+                <DataGridTemplateColumn Header="Status" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="10" Height="10" 
+                                        Fill="{Binding StatusColor}" 
+                                        Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Download" 
+                                  Binding="{Binding DownloadSpeedFormatted}" 
+                                  Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#2196F3"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Upload" 
+                                  Binding="{Binding UploadSpeedFormatted}" 
+                                  Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#4CAF50"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Ping" 
+                                  Binding="{Binding LatencyText}" 
+                                  Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#FF9800"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="CLEAR ALL HISTORY" 
+                   Click="ClearAllHistory_Click"
+                   Margin="0,0,10,0"
+                   Background="#D32F2F"
+                   Foreground="White"
+                   Style="{DynamicResource MaterialDesignRaisedButton}"/>
+            
+            <Button Content="CLEAR OLD LOGS (30+ DAYS)" 
+                   Click="ClearOldLogs_Click"
+                   Style="{DynamicResource MaterialDesignFlatButton}"/>
+        </StackPanel>
+    </Grid>
 </Window>

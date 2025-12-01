@@ -394,7 +394,115 @@ NotifyMe/
 
 ---
 
-## 🚀 **المراحل القادمة (من plan v1.md)**
+### **المرحلة 10: التحسينات الأساسية (Phase 1 Core Enhancement)** ✅ (مكتمل 100%)
+**التاريخ**: 1 ديسمبر 2025
+
+#### الميزات المنفذة:
+
+##### **1. لوحة التحكم الرئيسية (Main Dashboard):**
+- ✅ تصميم Material Design 5.x مع Dark Theme
+- ✅ 4 بطاقات إحصائيات Real-time:
+  - قوة الإشارة (Signal Strength)
+  - سرعة التحميل (Download Speed)
+  - سرعة الرفع (Upload Speed)
+  - زمن الاستجابة (Latency)
+- ✅ رسم بياني Live Charts للبيانات التاريخية
+- ✅ قائمة جانبية للتنقل (Navigation Sidebar)
+- ✅ تحديث تلقائي كل ثانية
+
+##### **2. تتبع التطبيقات (Per-Application Tracking):**
+- ✅ رصد فعلي للتطبيقات باستخدام P/Invoke و GetExtendedTcpTable
+- ✅ عرض الاتصالات الشبكية لكل تطبيق
+- ✅ تصنيف تلقائي (Browser, Gaming, Communication, System, etc.)
+- ✅ DataGrid مع:
+  - اسم التطبيق مع أيقونة
+  - عدد الاتصالات
+  - البيانات المرسلة / المستقبلة
+  - آخر نشاط
+  - التصنيف
+- ✅ بحث وفرز متقدم (حسب الاسم، الاستهلاك، الاتصالات، النشاط)
+- ✅ تحديث تلقائي كل 3 ثوان
+
+##### **3. نافذة التحليلات (Analytics Dashboard):**
+- ✅ واجهة Material Design شاملة
+- ✅ 4 بطاقات إحصائيات summary:
+  - Total Usage
+  - Average Speed (↓ Download / ↑ Upload)
+  - Peak Speed
+  - Active Time
+- ✅ 3 رسوم بيانية متقدمة:
+  - **Usage Over Time**: Line Chart للاستهلاك عبر الزمن
+  - **Upload vs Download**: Pie Chart للمقارنة
+  - **Peak Hours Analysis**: Column Chart لأوقات الذروة
+- ✅ فلترة حسب الفترة الزمنية:
+  - Today
+  - This Week
+  - This Month
+  - Custom Range
+- ✅ حسابات ذكية من قاعدة البيانات
+
+##### **4. تحسين نافذة التاريخ (Enhanced History Window):**
+- ✅ إعادة تصميم كاملة بـ Material Design
+- ✅ 4 بطاقات إحصائيات:
+  - Total Records
+  - Average Download Speed
+  - Average Upload Speed
+  - Average Ping
+- ✅ DataGrid متقدم مع:
+  - ألوان مخصصة للحالات
+  - تنسيق احترافي للبيانات
+  - Alternating row colors
+- ✅ فلترة زمنية محسّنة:
+  - Last Hour
+  - Last 24 Hours
+  - Last 7 Days
+  - Last 30 Days
+  - All Time
+- ✅ تصدير إلى CSV ✨ جديد
+- ✅ حذف جميع البيانات (Clear All History) ✨ جديد
+- ✅ حذف السجلات القديمة (+30 يوم)
+- ✅ تأكيد مزدوج للحماية
+
+##### **5. تحسينات عامة:**
+- ✅ توحيد الثيم عبر جميع النوافذ
+- ✅ إصلاح null reference errors
+- ✅ تحسين Async/Await patterns
+- ✅ معالجة أخطاء شاملة
+
+#### التقنيات الجديدة المستخدمة:
+- **LiveChartsCore 2.0** - رسوم بيانية متقدمة
+- **Material Design XAML 5.x** - تصميم Material Design
+- **P/Invoke** (iphlpapi.dll) - GetExtendedTcpTable للـ Process Tracking
+- **Async/Await** - برمجة غير متزامنة
+- **ObservableCollection** - تحديث UI تلقائي
+
+#### الملفات الجديدة:
+- `NotifyMe.UI/MainWindow.xaml.cs` (تحديث كامل)
+- `NotifyMe.UI/ApplicationsWindow.xaml` (جديد)
+- `NotifyMe.UI/ApplicationsWindow.xaml.cs` (جديد)
+- `NotifyMe.UI/AnalyticsWindow.xaml` (جديد)
+- `NotifyMe.UI/AnalyticsWindow.xaml.cs` (جديد)
+- `NotifyMe.Core/Services/ProcessMonitorService.cs` (جديد)
+
+#### الملفات المحدثة:
+- `NotifyMe.UI/App.xaml` (Dark Theme)
+- `NotifyMe.UI/App.xaml.cs` (دعم النوافذ الجديدة)
+- `NotifyMe.UI/MainWindow.xaml` (تصميم جديد كامل)
+- `NotifyMe.UI/HistoryWindow.xaml` (Material Design)
+- `NotifyMe.UI/HistoryWindow.xaml.cs` (CSV Export + Clear All)
+- `NotifyMe.UI/FloatingIconWindow.xaml` (تحسينات الرسم البياني)
+
+#### الإحصائيات:
+- **عدد النوافذ الجديدة**: 2 (Applications, Analytics)
+- **عدد الخدمات الجديدة**: 1 (ProcessMonitorService)
+- **عدد الميزات**: 5 ميزات رئيسية
+- **عدد الملفات**: 12+ ملف تم إنشاءه/تحديثه
+- **الوقت المستغرق**: يوم واحد
+- **عدد الأسطر**: 2000+ سطر جديد
+
+---
+
+## 🚀 **المراحل القادمة (من plan v1.md)
 
 ### **المرحلة 9: Do Not Disturb** ⏳
 - [ ] إضافة جدول زمني في Settings
@@ -414,22 +522,21 @@ NotifyMe/
 
 ## 📊 **الإحصائيات**
 
-- **عدد الملفات المنشأة**: 21+
-- **عدد الملفات المعدلة**: 40+
-- **عدد الميزات المنفذة**: 60+
-- **نسبة الإنجاز من plan v1.md**: ~80%
-- **عدد الإصلاحات الحرجة**: 3
+- **عدد الملفات المنشأة**: 30+
+- **عدد الملفات المعدلة**: 50+
+- **عدد الميزات المنفذة**: 75+
+- **نسبة الإنجاز من Phase 1**: 100% ✅
+- **عدد الإصلاحات الحرجة**: 5
+- **عدد النوافذ**: 7 (Main, Floating, Settings, History, Applications, Analytics, Custom Notifications)
+- **عدد الخدمات**: 8 (NetworkMonitor, TrafficMonitor, DataLogger, SettingsService, NotificationService, SoundService, AutoStartService, ProcessMonitorService)
 
 ---
 
 ## 🔗 **روابط مهمة**
 
 - [plan v1.md](file:///d:/Apps/C#/NofiyMe/plan%20v1.md) - الخطة الأصلية
-- [task.md](file:///C:/Users/ACER/.gemini/antigravity/brain/a5786063-2fc5-4391-a41b-ff8d612cd7b3/task.md) - قائمة المهام التفصيلية
-- [walkthrough.md](file:///C:/Users/ACER/.gemini/antigravity/brain/a5786063-2fc5-4391-a41b-ff8d612cd7b3/walkthrough.md) - شرح الإنجازات
-- [SETTINGS_REDESIGN.md](file:///d:/Apps/C#/NofiyMe/SETTINGS_REDESIGN.md) - وثائق تصميم الإعدادات
-- [NOTIFICATION_CONTROLS.md](file:///d:/Apps/C#/NofiyMe/NOTIFICATION_CONTROLS.md) - وثائق التحكم في الإشعارات
-- [AUTOSTART_TESTING.md](file:///d:/Apps/C#/NofiyMe/AUTOSTART_TESTING.md) - اختبار البدء التلقائي
+- [phase1_core_enhancement.md](file:///d:/Apps/C#/NofiyMe/phase1_core_enhancement.md) - خطة المرحلة الأولى
+- [COMMANDS.md](file:///d:/Apps/C#/NofiyMe/COMMANDS.md) - تعليمات العمل
 
 ---
 
@@ -439,10 +546,13 @@ NotifyMe/
 2. **الاستقرار**: تم إصلاح جميع الأخطاء الحرجة
 3. **التوافق**: يعمل على Windows 10/11 مع .NET 8
 4. **قاعدة البيانات**: تنظيف تلقائي للسجلات القديمة (+30 يوم)
-5. **الإشعارات**: تحكم كامل في Toast و Sound Notifications
+5. **الإشعارات**: تحكم كامل في Toast و Sound و Custom Notifications
 6. **واجهة الإعدادات**: تصميم جديد بالتبويبات أكثر تنظيماً
 7. **Auto-Start**: بدء تلقائي مع Windows بدون Admin rights
+8. **Material Design**: جميع النوافذ الآن تستخدم Material Design 5.x
+9. **Process Tracking**: تتبع فعلي للتطبيقات باستخدام P/Invoke
+10. **Analytics**: تحليلات متقدمة مع 3 رسوم بيانية
 
 ---
 
-**آخر تحديث**: 24 نوفمبر 2025، 11:55
+**آخر تحديث**: 1 ديسمبر 2025، 10:40

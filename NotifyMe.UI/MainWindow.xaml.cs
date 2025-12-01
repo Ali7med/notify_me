@@ -228,12 +228,30 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NavList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // Navigation logic placeholder
+        // Navigation logic
         if (NavList.SelectedItem is ListBoxItem item && item.Tag is string tag)
         {
             if (PageTitle != null) PageTitle.Text = tag;
             
-            // TODO: Switch content based on tag
+            // Handle navigation
+            var app = (App)Application.Current;
+            
+            switch (tag)
+            {
+                case "Applications":
+                    app.ShowApplicationsWindow();
+                    break;
+                case "Analytics":
+                    app.ShowAnalyticsWindow();
+                    break;
+                case "History":
+                    app.ShowHistoryWindow();
+                    break;
+                case "Dashboard":
+                default:
+                    // Already on dashboard
+                    break;
+            }
         }
     }
 

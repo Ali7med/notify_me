@@ -1,173 +1,243 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Media;
+using Microsoft.Win32;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
 
-namespace NotifyMe.UI
+namespace NotifyMe.UI;
+
+public partial class HistoryWindow : Window
 {
-    public partial class HistoryWindow : Window
+    private readonly DataLogger _dataLogger;
+
+    public HistoryWindow(DataLogger dataLogger)
     {
-        private readonly DataLogger _dataLogger;
+        InitializeComponent();
+        _dataLogger = dataLogger;
+        
+        LoadData();
+    }
 
-        public HistoryWindow(DataLogger dataLogger)
+    private void LoadData()
+    {
+        try
         {
-            InitializeComponent();
-            _dataLogger = dataLogger;
+            var range = GetDateRange();
+            var logs = _dataLogger.GetLogs(range.from, range.to);
             
-            // Apply initial translations and subscribe to changes
-            ApplyTranslations();
-            Helpers.LocalizationManager.LanguageChanged += (s, e) => 
+            if (!logs.Any())
             {
-                ApplyTranslations();
-                LoadData(); // Reload data to update localized status text
-            };
-            
-            LoadData();
-        }
-
-        private void ApplyTranslations()
-        {
-            var lang = Helpers.LocalizationManager.CurrentLanguage;
-            
-            // Window Title & Header
-            Title = lang.History.Title;
-            if (HeaderTitle != null) HeaderTitle.Text = lang.History.HeaderTitle;
-            
-            // Labels & Buttons
-            if (LblDateRange != null) LblDateRange.Text = lang.History.DateRange;
-            if (BtnRefresh != null) BtnRefresh.Content = lang.History.Refresh;
-            if (BtnClear != null) BtnClear.Content = lang.History.ClearLogs;
-
-            // DataGrid Columns
-            if (ColTime != null) ColTime.Header = lang.History.ColTime;
-            if (ColDate != null) ColDate.Header = lang.History.ColDate;
-            if (ColStatus != null) ColStatus.Header = lang.History.ColStatus;
-            if (ColDownload != null) ColDownload.Header = lang.History.ColDownload;
-            if (ColUpload != null) ColUpload.Header = lang.History.ColUpload;
-            if (ColPing != null) ColPing.Header = lang.History.ColPing;
-
-            // ComboBox Items
-            if (DateRangeComboBox != null)
-            {
-                foreach (ComboBoxItem item in DateRangeComboBox.Items)
-                {
-                    switch (item.Tag?.ToString())
-                    {
-                        case "LastHour": item.Content = lang.History.RangeLastHour; break;
-                        case "Last24Hours": item.Content = lang.History.RangeLast24Hours; break;
-                        case "Last7Days": item.Content = lang.History.RangeLast7Days; break;
-                        case "Last30Days": item.Content = lang.History.RangeLast30Days; break;
-                        case "AllTime": item.Content = lang.History.RangeAllTime; break;
-                    }
-                }
+                ShowNoDataMessage();
+                return;
             }
 
-            // Handle RTL/LTR
-            FlowDirection = lang.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+            // Calculate statistics
+            CalculateStatistics(logs);
+            
+            // Convert to display models
+            var displayData = logs.Select(log => new NetworkLogDisplay
+            {
+                Timestamp = log.Timestamp,
+                StatusText = log.IsConnected ? "Connected" : "Disconnected",
+                StatusColor = log.IsConnected ? Brushes.LimeGreen : Brushes.Red,
+                DownloadSpeedFormatted = FormatSpeed(log.DownloadSpeedBps),
+                UploadSpeedFormatted = FormatSpeed(log.UploadSpeedBps),
+                LatencyText = log.Latency < 0 ? "TIMEOUT" : $"{log.Latency} ms"
+            }).ToList();
+
+            HistoryDataGrid.ItemsSource = displayData;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading history: {ex.Message}", "Error", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void CalculateStatistics(List<NetworkLog> logs)
+    {
+        RecordCountText.Text = logs.Count.ToString();
+        
+        var avgDownload = logs.Average(l => l.DownloadSpeedBps);
+        AvgDownloadText.Text = FormatSpeed(avgDownload);
+        
+        var avgUpload = logs.Average(l => l.UploadSpeedBps);
+        AvgUploadText.Text = FormatSpeed(avgUpload);
+        
+        var connectedLogs = logs.Where(l => l.IsConnected && l.Latency >= 0).ToList();
+        var avgPing = connectedLogs.Any() ? connectedLogs.Average(l => l.Latency) : 0;
+        AvgPingText.Text = $"{avgPing:F0} ms";
+    }
+
+    private void ShowNoDataMessage()
+    {
+        RecordCountText.Text = "0";
+        AvgDownloadText.Text = "No data";
+        AvgUploadText.Text = "No data";
+        AvgPingText.Text = "No data";
+        HistoryDataGrid.ItemsSource = null;
+    }
+
+    private (DateTime from, DateTime to) GetDateRange()
+    {
+        var to = DateTime.Now;
+        var from = to;
+
+        if (DateRangeComboBox.SelectedItem is ComboBoxItem selectedItem)
+        {
+            switch (selectedItem.Tag?.ToString())
+            {
+                case "LastHour": 
+                    from = to.AddHours(-1); 
+                    break;
+                case "Last24Hours": 
+                    from = to.AddDays(-1); 
+                    break;
+                case "Last7Days": 
+                    from = to.AddDays(-7); 
+                    break;
+                case "Last30Days": 
+                    from = to.AddDays(-30); 
+                    break;
+                case "AllTime": 
+                    from = DateTime.MinValue; 
+                    break;
+            }
         }
 
-        private void LoadData()
+        return (from, to);
+    }
+
+    private string FormatSpeed(double bytesPerSecond)
+    {
+        if (bytesPerSecond < 1024) 
+            return $"{bytesPerSecond:F0} B/s";
+        if (bytesPerSecond < 1024 * 1024) 
+            return $"{bytesPerSecond / 1024.0:F1} KB/s";
+        return $"{bytesPerSecond / (1024.0 * 1024.0):F2} MB/s";
+    }
+
+    private void DateRangeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (HistoryDataGrid != null)
         {
-            try
+            LoadData();
+        }
+    }
+
+    private void RefreshButton_Click(object sender, RoutedEventArgs e)
+    {
+        LoadData();
+    }
+
+    private void ExportButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var saveDialog = new SaveFileDialog
             {
-                var lang = Helpers.LocalizationManager.CurrentLanguage;
+                Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                FileName = $"NetworkHistory_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                DefaultExt = ".csv"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
                 var range = GetDateRange();
                 var logs = _dataLogger.GetLogs(range.from, range.to);
                 
-                // Convert to display models
-                var displayData = logs.Select(log => new NetworkLogDisplay
+                var csv = new StringBuilder();
+                csv.AppendLine("Timestamp,Status,Download (B/s),Upload (B/s),Latency (ms)");
+                
+                foreach (var log in logs)
                 {
-                    Timestamp = log.Timestamp,
-                    StatusText = log.IsConnected ? lang.MainWindow.Connected : lang.MainWindow.Disconnected,
-                    DownloadSpeedFormatted = FormatSpeed(log.DownloadSpeedBps),
-                    UploadSpeedFormatted = FormatSpeed(log.UploadSpeedBps),
-                    LatencyText = log.Latency < 0 ? "TIMEOUT" : $"{log.Latency}"
-                }).ToList();
-
-                HistoryDataGrid.ItemsSource = displayData;
-                if (RecordCountText != null)
-                    RecordCountText.Text = string.Format(lang.History.RecordsFormat, displayData.Count);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading history: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    csv.AppendLine($"{log.Timestamp:yyyy-MM-dd HH:mm:ss}," +
+                                 $"{(log.IsConnected ? "Connected" : "Disconnected")}," +
+                                 $"{log.DownloadSpeedBps}," +
+                                 $"{log.UploadSpeedBps}," +
+                                 $"{log.Latency}");
+                }
+                
+                File.WriteAllText(saveDialog.FileName, csv.ToString(), Encoding.UTF8);
+                
+                MessageBox.Show($"Data exported successfully to:\n{saveDialog.FileName}", 
+                    "Export Successful", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-
-        private (DateTime from, DateTime to) GetDateRange()
+        catch (Exception ex)
         {
-            var to = DateTime.Now;
-            var from = to;
-
-            var selectedIndex = DateRangeComboBox.SelectedIndex;
-            switch (selectedIndex)
-            {
-                case 0: from = to.AddHours(-1); break;      // Last Hour
-                case 1: from = to.AddDays(-1); break;       // Last 24 Hours
-                case 2: from = to.AddDays(-7); break;       // Last 7 Days
-                case 3: from = to.AddDays(-30); break;      // Last 30 Days
-                case 4: from = DateTime.MinValue; break;    // All Time
-            }
-
-            return (from, to);
-        }
-
-        private string FormatSpeed(double bytesPerSecond)
-        {
-            if (bytesPerSecond < 1024) return $"{bytesPerSecond:F0} B/s";
-            if (bytesPerSecond < 1024 * 1024) return $"{bytesPerSecond / 1024.0:F1} KB/s";
-            return $"{bytesPerSecond / (1024.0 * 1024.0):F1} MB/s";
-        }
-
-        private void DateRangeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (HistoryDataGrid != null) // Check if initialized
-            {
-                LoadData();
-            }
-        }
-
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            LoadData();
-        }
-
-        private void ClearOldLogs_Click(object sender, RoutedEventArgs e)
-        {
-            var result = MessageBox.Show("Are you sure you want to delete logs older than 30 days?", 
-                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            
-            if (result == MessageBoxResult.Yes)
-            {
-                _dataLogger.ClearOldLogs(30);
-                LoadData();
-                MessageBox.Show("Old logs cleared successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-        }
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-                DragMove();
+            MessageBox.Show($"Error exporting data: {ex.Message}", "Export Error", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    // Display model for DataGrid
-    public class NetworkLogDisplay
+    private void ClearOldLogs_Click(object sender, RoutedEventArgs e)
     {
-        public DateTime Timestamp { get; set; }
-        public string StatusText { get; set; } = "";
-        public string DownloadSpeedFormatted { get; set; } = "";
-        public string UploadSpeedFormatted { get; set; } = "";
-        public string LatencyText { get; set; } = "";
+        var result = MessageBox.Show(
+            "Are you sure you want to delete logs older than 30 days?\n\nThis action cannot be undone.", 
+            "Confirm Delete", 
+            MessageBoxButton.YesNo, 
+            MessageBoxImage.Warning);
+        
+        if (result == MessageBoxResult.Yes)
+        {
+            _dataLogger.ClearOldLogs(30);
+            LoadData();
+            MessageBox.Show("Old logs cleared successfully.", "Success", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
+
+    private void ClearAllHistory_Click(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show(
+            "⚠️ WARNING ⚠️\n\nThis will permanently delete ALL network history data!\n\nAre you absolutely sure you want to continue?", 
+            "Delete All History", 
+            MessageBoxButton.YesNo, 
+            MessageBoxImage.Warning);
+        
+        if (result == MessageBoxResult.Yes)
+        {
+            // Double confirmation for safety
+            var confirmResult = MessageBox.Show(
+                "This is your last chance!\n\nAll historical data will be lost forever.\n\nType 'YES' to confirm deletion.", 
+                "Final Confirmation", 
+                MessageBoxButton.YesNo, 
+                MessageBoxImage.Stop);
+            
+            if (confirmResult == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    // Clear all logs (0 days means delete everything)
+                    _dataLogger.ClearOldLogs(0);
+                    LoadData();
+                    MessageBox.Show("All history has been cleared.", "Completed", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error clearing history: {ex.Message}", "Error", 
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+    }
+}
+
+// Display model for DataGrid
+public class NetworkLogDisplay
+{
+    public DateTime Timestamp { get; set; }
+    public string StatusText { get; set; } = "";
+    public Brush StatusColor { get; set; } = Brushes.Gray;
+    public string DownloadSpeedFormatted { get; set; } = "";
+    public string UploadSpeedFormatted { get; set; } = "";
+    public string LatencyText { get; set; } = "";
 }
