@@ -317,17 +317,24 @@ public partial class App : Application
         _settingsWindow.Activate();
     }
 
-    private void ShowMainWindow()
+    public void ShowMainWindow()
     {
-        if (_mainWindow == null)
+        try
         {
-            _mainWindow = new MainWindow(_networkMonitor, _trafficMonitor);
-            _mainWindow.Closed += (s, e) => _mainWindow = null;
-        }
+            if (_mainWindow == null)
+            {
+                _mainWindow = new MainWindow(_networkMonitor, _trafficMonitor);
+                _mainWindow.Closed += (s, e) => _mainWindow = null;
+            }
 
-        _mainWindow.Show();
-        _mainWindow.WindowState = WindowState.Normal;
-        _mainWindow.Activate();
+            _mainWindow.Show();
+            _mainWindow.WindowState = WindowState.Normal;
+            _mainWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Main Window: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void Exit_Click(object sender, RoutedEventArgs e)

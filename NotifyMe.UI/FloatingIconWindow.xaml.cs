@@ -50,16 +50,16 @@ namespace NotifyMe.UI
                 new LineSeries<double>
                 {
                     Values = _downloadValues,
-                    Fill = new SolidColorPaint(SKColors.DodgerBlue.WithAlpha(50)),
-                    Stroke = new SolidColorPaint(SKColors.DodgerBlue) { StrokeThickness = 1 },
+                    Fill = new SolidColorPaint(SKColors.DodgerBlue.WithAlpha(100)),
+                    Stroke = new SolidColorPaint(SKColors.DodgerBlue) { StrokeThickness = 2 },
                     GeometrySize = 0,
                     LineSmoothness = 1
                 },
                 new LineSeries<double>
                 {
                     Values = _uploadValues,
-                    Fill = new SolidColorPaint(SKColors.Gold.WithAlpha(50)),
-                    Stroke = new SolidColorPaint(SKColors.Gold) { StrokeThickness = 1 },
+                    Fill = new SolidColorPaint(SKColors.Gold.WithAlpha(100)),
+                    Stroke = new SolidColorPaint(SKColors.Gold) { StrokeThickness = 2 },
                     GeometrySize = 0,
                     LineSmoothness = 1
                 }

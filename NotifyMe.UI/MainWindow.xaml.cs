@@ -11,7 +11,10 @@ using SkiaSharp;
 
 namespace NotifyMe.UI;
 
-public partial class MainWindow : Window
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+public partial class MainWindow : Window, INotifyPropertyChanged
 {
     private readonly NetworkMonitor? _networkMonitor;
     private readonly TrafficMonitor? _trafficMonitor;
@@ -19,13 +22,39 @@ public partial class MainWindow : Window
     // Chart Data
     private readonly ObservableCollection<double> _downloadSpeedHistory;
     private readonly ObservableCollection<double> _uploadSpeedHistory;
-    public ISeries[] Series { get; set; }
-    public Axis[] XAxes { get; set; }
-    public Axis[] YAxes { get; set; }
+
+    private ISeries[] _series;
+    public ISeries[] Series 
+    { 
+        get => _series; 
+        set { _series = value; OnPropertyChanged(); } 
+    }
+
+    private Axis[] _xAxes;
+    public Axis[] XAxes 
+    { 
+        get => _xAxes; 
+        set { _xAxes = value; OnPropertyChanged(); } 
+    }
+
+    private Axis[] _yAxes;
+    public Axis[] YAxes 
+    { 
+        get => _yAxes; 
+        set { _yAxes = value; OnPropertyChanged(); } 
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public MainWindow(NetworkMonitor? networkMonitor, TrafficMonitor? trafficMonitor)
     {
         InitializeComponent();
+        DataContext = this; // Enable Data Binding
+        
         try 
         {
             Icon = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/icon.ico"));
@@ -100,10 +129,6 @@ public partial class MainWindow : Window
                 LabelsPaint = new SolidColorPaint(SKColors.Gray)
             }
         };
-
-        MainChart.Series = Series;
-        MainChart.XAxes = XAxes;
-        MainChart.YAxes = YAxes;
     }
 
     private void ApplyTranslations()
