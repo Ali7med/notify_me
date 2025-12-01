@@ -1,4 +1,5 @@
 using System.Windows;
+using System.IO;
 using Hardcodet.Wpf.TaskbarNotification;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
@@ -23,6 +24,47 @@ public partial class App : Application
     private readonly AppSettings _settings = new();
 
     private void Application_Startup(object sender, StartupEventArgs e)
+    {
+        // Setup Global Exception Handling
+        AppDomain.CurrentDomain.UnhandledException += (s, args) =>
+            LogCrash((Exception)args.ExceptionObject, "AppDomain.UnhandledException");
+
+        DispatcherUnhandledException += (s, args) =>
+        {
+            LogCrash(args.Exception, "DispatcherUnhandledException");
+            args.Handled = true; // Prevent immediate crash if possible
+        };
+
+        TaskScheduler.UnobservedTaskException += (s, args) =>
+        {
+            LogCrash(args.Exception, "TaskScheduler.UnobservedTaskException");
+            args.SetObserved();
+        };
+
+        try
+        {
+            InitializeApp();
+        }
+        catch (Exception ex)
+        {
+            LogCrash(ex, "Startup Exception");
+            MessageBox.Show($"Startup Error: {ex.Message}\nSee crash_log.txt for details.", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown();
+        }
+    }
+
+    private void LogCrash(Exception ex, string source)
+    {
+        try
+        {
+            string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash_log.txt");
+            string message = $"[{DateTime.Now}] {source}:\n{ex}\n\n--------------------------------\n\n";
+            File.AppendAllText(logPath, message);
+        }
+        catch { /* Ignore logging errors */ }
+    }
+
+    private void InitializeApp()
     {
         // Initialize system tray icon
         _notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -80,6 +122,9 @@ public partial class App : Application
         // Show floating network usage icon
         _floatingIcon = new FloatingIconWindow(_networkMonitor, _trafficMonitor, _settingsService, ShowMainWindow, ShowSettingsWindow);
         _floatingIcon.Show();
+
+        // DEBUG: Show Main Window at startup
+        // ShowMainWindow();
 
         // Update tray icon tooltip and menu translations
         UpdateTrayIcon();
@@ -261,7 +306,7 @@ public partial class App : Application
         ShowSettingsWindow();
     }
 
-    private void ShowSettingsWindow()
+    public void ShowSettingsWindow()
     {
         if (_settingsWindow == null)
         {

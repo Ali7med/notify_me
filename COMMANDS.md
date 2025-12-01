@@ -142,4 +142,172 @@ Text Secondary: #AAAAAA
 
 ---
 
-**آخر تحديث**: 23 نوفمبر 2025، 14:01
+## 🔔 **الإشعارات التلقائية بعد إكمال المهام**
+
+### **القاعدة #2: إرسال إشعار Telegram بعد كل جزء كبير**
+**التاريخ**: 30 نوفمبر 2025
+
+بعد إكمال أي جزء كبير من المهام (مرحلة، أيام متعددة، أو milestone)، يجب:
+
+#### **1. إرسال إشعار Telegram**
+
+يجب إرسال إشعار يتضمن:
+
+```
+🎉 تم إكمال المهمة بنجاح ✅
+
+📋 المهمة: [اسم المهمة/المرحلة المكتملة]
+
+[تفاصيل الإنجاز - نقاط رئيسية]
+✅ ميزة 1
+✅ ميزة 2
+✅ ميزة 3
+[إلخ...]
+
+تم اتباع المعايير:
+✅ معيار 1
+✅ معيار 2
+✅ معيار 3
+
+Progress: X% (Y/Z tasks/days)
+Next: [المهمة/المرحلة القادمة]
+⏰ الوقت: YYYY-MM-DD HH:mm:ss
+💻 المشروع: [اسم المشروع]
+
+────────────────
+تم الإرسال تلقائياً من نظام المهام
+```
+
+**مثال عملي:**
+```
+🎉 تم إكمال المهمة بنجاح ✅
+
+📋 المهمة: ✅ Settings Window UI/UX Complete
+
+🎨 تصميم احترافي بـ Dark Theme
+📐 Layout منظم مع ScrollViewer
+🔧 4 تبويبات (Appearance, Network, Notifications, Advanced)
+⚙️ Custom ComboBox Styling
+🎯 Visual Hierarchy واضح
+
+تم اتباع معايير التصميم:
+✅ Bank UI Style
+✅ Color Scheme محدد
+✅ Segoe UI Variable Display
+✅ Proper Spacing & Alignment
+
+Progress: 45% (9/20 tasks)
+Next: Testing & Bug Fixes
+⏰ الوقت: 2025-11-30 14:04:53
+💻 المشروع: NotifyMe
+
+────────────────
+تم الإرسال تلقائياً من نظام المهام
+```
+
+#### **2. عمل Git Commit موثق**
+
+بعد الإشعار، يجب عمل commit بتفاصيل واضحة:
+
+**بنية الـ Commit Message:**
+```
+[نوع] المهمة المكتملة - وصف موجز
+
+## التغييرات الرئيسية:
+- تغيير 1 (الملفات المتأثرة)
+- تغيير 2 (الملفات المتأثرة)
+- تغيير 3 (الملفات المتأثرة)
+
+## الملفات المضافة/المعدلة:
+- ملف1.xaml: وصف التغيير
+- ملف2.cs: وصف التغيير
+- ملف3.md: تحديث التوثيق
+
+## المعايير المتبعة:
+- معيار 1
+- معيار 2
+- معيار 3
+
+## التقدم العام:
+Progress: X% (Y/Z)
+Next Phase: [المرحلة القادمة]
+
+## Testing:
+- ✅ Build successful
+- ✅ Runtime tested
+- ✅ UI/UX verified
+```
+
+**أنواع الـ Commits:**
+- `[FEAT]` - ميزة جديدة
+- `[FIX]` - إصلاح مشكلة
+- `[STYLE]` - تحسينات تصميمية
+- `[REFACTOR]` - إعادة هيكلة الكود
+- `[DOCS]` - تحديث التوثيق
+- `[TEST]` - إضافة/تحديث الاختبارات
+- `[MILESTONE]` - إكمال مرحلة كاملة
+
+**مثال عملي:**
+```
+[STYLE] Settings Window Complete - Bank UI Dark Theme
+
+## التغييرات الرئيسية:
+- إعادة تصميم كامل لنافذة الإعدادات (SettingsWindow.xaml)
+- تحسين Layout مع ScrollViewer
+- Custom ComboBox Styling مع Dark Theme
+- تحسين Visual Hierarchy لجميع التبويبات
+
+## الملفات المضافة/المعدلة:
+- SettingsWindow.xaml: إعادة بناء كامل للـ UI
+- SettingsWindow.xaml.cs: تحديث التنسيق والتعليقات
+- PROGRESS.md: إضافة إنجاز Settings Window
+- README.md: تحديث قسم الميزات
+- task.md: تحديد المهام المكتملة
+
+## المعايير المتبعة:
+- Bank UI Professional Design
+- Dark Theme (#1E1E1E, #2D2D2D, #4CC2FF)
+- Segoe UI Variable Display Font
+- Proper Spacing (Margins 20-40)
+- Clean XAML Structure
+
+## التقدم العام:
+Progress: 45% (9/20 tasks)
+Next Phase: Testing & Bug Fixes
+
+## Testing:
+- ✅ Build successful (dotnet build)
+- ✅ Runtime tested (dotnet run)
+- ✅ All tabs functional
+- ✅ Dark theme consistent
+- ✅ ScrollViewer working properly
+```
+
+### **متى يتم الإشعار والـ Commit:**
+
+1. **بعد إكمال مرحلة كاملة** (Phase)
+2. **بعد إكمال عدة أيام متتالية من الخطة** (مثلاً Days 16-17)
+3. **بعد إكمال milestone مهم** (مثل: Dashboard Complete، Authentication System)
+4. **بعد إصلاح مشكلة كبيرة أو critical bug**
+
+### **الإجراء المتبع:**
+
+```
+1. إنهاء العمل على المهمة/المرحلة
+   ↓
+2. تحديث PROGRESS.md و README.md و task.md
+   ↓
+3. إرسال إشعار Telegram بالتفاصيل المطلوبة
+   ↓
+4. عمل git add للملفات المتأثرة
+   ↓
+5. عمل git commit مع رسالة موثقة
+   ↓
+6. (اختياري) git push إذا طلب المستخدم
+   ↓
+7. إخبار المستخدم بالإنجاز والخطوة القادمة
+```
+
+---
+
+**آخر تحديث**: 30 نوفمبر 2025، 14:37

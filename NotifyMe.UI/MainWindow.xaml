@@ -4,127 +4,190 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NotifyMe.UI"
+        xmlns:controls="clr-namespace:NotifyMe.UI.Controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         mc:Ignorable="d"
         Title="NotifyMe - Network Monitor" 
-        Height="500" Width="700"
+        Height="700" Width="1100"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E1E">
-    <Window.Resources>
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-        </Style>
-        <Style TargetType="Border">
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="15"/>
-        </Style>
-    </Window.Resources>
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        FontFamily="{DynamicResource MaterialDesignFont}">
     
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <!-- Header -->
-        <TextBlock x:Name="HeaderTitle" Grid.Row="0" 
-                   Text="Network Monitor" 
-                   FontSize="28" 
-                   FontWeight="Bold"
-                   Margin="0,0,0,20"/>
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="{DynamicResource MaterialDesignCardBackground}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-        <!-- Connection Status -->
-        <Border Grid.Row="1" 
-                Background="#2D2D30" 
-                Margin="0,0,0,15">
-            <StackPanel>
-                <TextBlock x:Name="LblConnectionStatus" Text="Connection Status" 
-                          FontSize="16" 
-                          FontWeight="SemiBold"
-                          Margin="0,0,0,10"/>
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse x:Name="StatusIndicator" 
-                            Width="16" 
-                            Height="16" 
-                            Fill="Lime"
-                            Margin="0,0,10,0"/>
-                    <TextBlock x:Name="StatusText" 
-                              Text="Connected" 
-                              FontSize="14"
-                              VerticalAlignment="Center"/>
+                <!-- Logo/Brand -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,30,20,40">
+                    <materialDesign:PackIcon Kind="AccessPointNetwork" Width="32" Height="32" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <TextBlock Text="NotifyMe" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
-            </StackPanel>
+
+                <!-- Navigation Menu -->
+                <StackPanel Grid.Row="1">
+                    <ListBox x:Name="NavList" SelectionChanged="NavList_SelectionChanged" SelectedIndex="0">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                <Setter Property="Padding" Value="16"/>
+                                <Setter Property="Margin" Value="10,2"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        
+                        <ListBoxItem Tag="Dashboard">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24" Margin="0,0,15,0"/>
+                                <TextBlock Text="Dashboard" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        
+                        <ListBoxItem Tag="Applications">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Apps" Width="24" Height="24" Margin="0,0,15,0"/>
+                                <TextBlock Text="Applications" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        
+                        <ListBoxItem Tag="Analytics">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ChartBox" Width="24" Height="24" Margin="0,0,15,0"/>
+                                <TextBlock Text="Analytics" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        
+                        <ListBoxItem Tag="History">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="History" Width="24" Height="24" Margin="0,0,15,0"/>
+                                <TextBlock Text="History" VerticalAlignment="Center" FontSize="14"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Bottom Actions -->
+                <StackPanel Grid.Row="2" Margin="10,0,10,20">
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                            HorizontalContentAlignment="Left" Padding="16"
+                            Click="ShowSettings_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Cog" Width="24" Height="24" Margin="0,0,15,0"/>
+                            <TextBlock Text="Settings" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- Traffic Statistics -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="15"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- Main Content Area -->
+        <Grid Grid.Column="1" Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <!-- Download -->
-            <Border Grid.Column="0" Background="#2D2D30" Padding="15" CornerRadius="5">
+            <!-- Top Bar -->
+            <Grid Grid.Row="0" Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
                 <StackPanel>
-                    <TextBlock x:Name="LblDownload" Text="Download Speed" FontSize="14" Foreground="#AAAAAA" Margin="0,0,0,5"/>
-                    <TextBlock x:Name="DownloadSpeed" Text="0 KB/s" FontSize="24" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <TextBlock x:Name="TotalDownload" Text="Total: 0 B" FontSize="12" Foreground="#808080"/>
+                    <TextBlock x:Name="PageTitle" Text="Dashboard" FontSize="28" FontWeight="Bold"/>
+                    <TextBlock Text="Real-time network monitoring" FontSize="14" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                 </StackPanel>
-            </Border>
 
-            <!-- Upload -->
-            <Border Grid.Column="2" Background="#2D2D30" Padding="15" CornerRadius="5">
-                <StackPanel>
-                    <TextBlock x:Name="LblUpload" Text="Upload Speed" FontSize="14" Foreground="#AAAAAA" Margin="0,0,0,5"/>
-                    <TextBlock x:Name="UploadSpeed" Text="0 KB/s" FontSize="24" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <TextBlock x:Name="TotalUpload" Text="Total: 0 B" FontSize="12" Foreground="#808080"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Refresh">
+                        <materialDesign:PackIcon Kind="Refresh"/>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Notifications" Margin="10,0,0,0">
+                        <materialDesign:PackIcon Kind="Bell"/>
+                    </Button>
+                    <materialDesign:PopupBox PlacementMode="BottomAndAlignRightEdges" StaysOpen="False" Margin="10,0,0,0">
+                        <StackPanel Width="150">
+                            <Button Content="Profile"/>
+                            <Button Content="Help"/>
+                            <Separator/>
+                            <Button Content="Exit" Click="Exit_Click"/>
+                        </StackPanel>
+                    </materialDesign:PopupBox>
                 </StackPanel>
-            </Border>
+            </Grid>
+
+            <!-- Content -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Stat Cards -->
+                    <Grid Grid.Row="0" Margin="0,0,0,30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <controls:StatCard x:Name="CardDownload" Title="DOWNLOAD" Value="0.0 MB/s" Icon="Download" IconForeground="#2196F3" Trend="+12%" IsTrendPositive="True" Margin="0,0,10,0"/>
+                        <controls:StatCard x:Name="CardUpload" Grid.Column="1" Title="UPLOAD" Value="0.0 MB/s" Icon="Upload" IconForeground="#4CAF50" Trend="-5%" IsTrendPositive="False" Margin="10,0,10,0"/>
+                        <controls:StatCard x:Name="CardPing" Grid.Column="2" Title="PING" Value="0 ms" Icon="Pulse" IconForeground="#FFC107" Trend="Stable" IsTrendPositive="True" Margin="10,0,10,0"/>
+                        <controls:StatCard x:Name="CardUsage" Grid.Column="3" Title="USAGE" Value="0 GB" Icon="ChartDonut" IconForeground="#9C27B0" Trend="+2 GB" IsTrendPositive="True" Margin="10,0,0,0"/>
+                    </Grid>
+
+                    <!-- Charts Area -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Main Chart -->
+                        <materialDesign:Card Grid.Column="0" Margin="0,0,15,0" Padding="20" Height="300">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Network Traffic" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                
+                                <!-- LiveCharts CartesianChart -->
+                                <lvc:CartesianChart x:Name="MainChart" Grid.Row="1"/>
+                            </Grid>
+                        </materialDesign:Card>
+                        
+                        <!-- Top Apps -->
+                        <materialDesign:Card Grid.Column="1" Padding="20" Height="300">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Top Applications" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Coming Soon" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                            </Grid>
+                        </materialDesign:Card>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
         </Grid>
-
-        <!-- Footer -->
-        <StackPanel Grid.Row="3" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,15,0,0">
-            <TextBlock x:Name="LastUpdate" 
-                      Text="Last update: --:--:--" 
-                      FontSize="11"
-                      Foreground="#808080"
-                      VerticalAlignment="Center"
-                      Margin="0,0,15,0"/>
-            <Button x:Name="BtnMinimize" Content="Minimize to Tray" 
-                    Click="MinimizeToTray_Click"
-                    Padding="15,8"
-                    Background="#007ACC"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border Background="{TemplateBinding Background}"
-                                            CornerRadius="4"
-                                            Padding="{TemplateBinding Padding}">
-                                        <ContentPresenter HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1C97EA"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </StackPanel>
     </Grid>
 </Window>

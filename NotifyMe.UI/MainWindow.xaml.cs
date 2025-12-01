@@ -1,7 +1,13 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace NotifyMe.UI;
 
@@ -9,6 +15,13 @@ public partial class MainWindow : Window
 {
     private readonly NetworkMonitor? _networkMonitor;
     private readonly TrafficMonitor? _trafficMonitor;
+    
+    // Chart Data
+    private readonly ObservableCollection<double> _downloadSpeedHistory;
+    private readonly ObservableCollection<double> _uploadSpeedHistory;
+    public ISeries[] Series { get; set; }
+    public Axis[] XAxes { get; set; }
+    public Axis[] YAxes { get; set; }
 
     public MainWindow(NetworkMonitor? networkMonitor, TrafficMonitor? trafficMonitor)
     {
@@ -24,11 +37,17 @@ public partial class MainWindow : Window
 
         _networkMonitor = networkMonitor;
         _trafficMonitor = trafficMonitor;
+        
+        // Initialize Chart Data
+        _downloadSpeedHistory = new ObservableCollection<double>(Enumerable.Repeat(0.0, 60));
+        _uploadSpeedHistory = new ObservableCollection<double>(Enumerable.Repeat(0.0, 60));
+        
+        InitializeChart();
 
         if (_networkMonitor != null)
         {
             _networkMonitor.ConnectionStateChanged += OnConnectionStateChanged;
-            UpdateConnectionStatus(_networkMonitor.IsConnected);
+            _networkMonitor.LatencyChanged += OnLatencyChanged;
         }
 
         if (_trafficMonitor != null)
@@ -41,6 +60,51 @@ public partial class MainWindow : Window
         ApplyTranslations();
         Helpers.LocalizationManager.LanguageChanged += (s, e) => ApplyTranslations();
     }
+    
+    private void InitializeChart()
+    {
+        Series = new ISeries[]
+        {
+            new LineSeries<double>
+            {
+                Values = _downloadSpeedHistory,
+                Name = "Download",
+                Fill = null,
+                Stroke = new SolidColorPaint(SKColors.DeepSkyBlue) { StrokeThickness = 2 },
+                GeometrySize = 0
+            },
+            new LineSeries<double>
+            {
+                Values = _uploadSpeedHistory,
+                Name = "Upload",
+                Fill = null,
+                Stroke = new SolidColorPaint(SKColors.LimeGreen) { StrokeThickness = 2 },
+                GeometrySize = 0
+            }
+        };
+
+        XAxes = new Axis[]
+        {
+            new Axis
+            {
+                IsVisible = false
+            }
+        };
+
+        YAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Speed (MB/s)",
+                NamePaint = new SolidColorPaint(SKColors.Gray),
+                LabelsPaint = new SolidColorPaint(SKColors.Gray)
+            }
+        };
+
+        MainChart.Series = Series;
+        MainChart.XAxes = XAxes;
+        MainChart.YAxes = YAxes;
+    }
 
     private void ApplyTranslations()
     {
@@ -48,20 +112,13 @@ public partial class MainWindow : Window
         
         // Window Title & Header
         Title = lang.MainWindow.Title;
-        if (HeaderTitle != null) HeaderTitle.Text = lang.MainWindow.HeaderTitle;
+        if (PageTitle != null) PageTitle.Text = "Dashboard"; // TODO: Add to strings
         
-        // Labels
-        if (LblConnectionStatus != null) LblConnectionStatus.Text = lang.MainWindow.ConnectionStatus;
-        if (LblDownload != null) LblDownload.Text = lang.MainWindow.DownloadSpeed;
-        if (LblUpload != null) LblUpload.Text = lang.MainWindow.UploadSpeed;
-        if (BtnMinimize != null) BtnMinimize.Content = lang.MainWindow.MinimizeButton;
-
-        // Update dynamic text if we have current state
-        if (_networkMonitor != null)
-            UpdateConnectionStatus(_networkMonitor.IsConnected);
-            
-        if (_trafficMonitor != null)
-            UpdateTrafficStats(_trafficMonitor.CurrentStats);
+        // Stat Cards Titles
+        if (CardDownload != null) CardDownload.Title = lang.MainWindow.DownloadSpeed.ToUpper();
+        if (CardUpload != null) CardUpload.Title = lang.MainWindow.UploadSpeed.ToUpper();
+        if (CardPing != null) CardPing.Title = "PING";
+        if (CardUsage != null) CardUsage.Title = "USAGE";
 
         // Handle RTL/LTR
         FlowDirection = lang.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
@@ -71,7 +128,31 @@ public partial class MainWindow : Window
     {
         Dispatcher.Invoke(() =>
         {
-            UpdateConnectionStatus(e.EventType == ConnectionEventType.Connected);
+            // Update UI based on connection state if needed
+            // Currently handled by traffic monitor updates (0 speed when disconnected)
+        });
+    }
+
+    private void OnLatencyChanged(object? sender, long latency)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (CardPing != null)
+            {
+                if (latency < 0)
+                {
+                    CardPing.Value = "TIMEOUT";
+                    CardPing.IconForeground = Brushes.Red;
+                }
+                else
+                {
+                    CardPing.Value = $"{latency} ms";
+                    
+                    if (latency < 50) CardPing.IconForeground = Brushes.Green;
+                    else if (latency < 150) CardPing.IconForeground = Brushes.Orange;
+                    else CardPing.IconForeground = Brushes.Red;
+                }
+            }
         });
     }
 
@@ -80,35 +161,66 @@ public partial class MainWindow : Window
         Dispatcher.Invoke(() =>
         {
             UpdateTrafficStats(stats);
+            UpdateChart(stats);
         });
-    }
-
-    private void UpdateConnectionStatus(bool isConnected)
-    {
-        var lang = Helpers.LocalizationManager.CurrentLanguage;
-        StatusText.Text = isConnected ? lang.MainWindow.Connected : lang.MainWindow.Disconnected;
-        StatusIndicator.Fill = new SolidColorBrush(isConnected ? Colors.Lime : Colors.Red);
     }
 
     private void UpdateTrafficStats(NetworkStats stats)
     {
-        var lang = Helpers.LocalizationManager.CurrentLanguage;
-        DownloadSpeed.Text = stats.DownloadSpeedFormatted;
-        UploadSpeed.Text = stats.UploadSpeedFormatted;
-        TotalDownload.Text = $"{lang.MainWindow.TotalPrefix}{NetworkStats.FormatBytes(stats.TotalBytesReceived)}";
-        TotalUpload.Text = $"{lang.MainWindow.TotalPrefix}{NetworkStats.FormatBytes(stats.TotalBytesSent)}";
-        LastUpdate.Text = $"{lang.MainWindow.LastUpdatePrefix}{stats.Timestamp:HH:mm:ss}";
+        if (CardDownload != null)
+        {
+            CardDownload.Value = stats.DownloadSpeedFormatted;
+            CardDownload.Trend = $"Total: {NetworkStats.FormatBytes(stats.TotalBytesReceived)}";
+        }
+
+        if (CardUpload != null)
+        {
+            CardUpload.Value = stats.UploadSpeedFormatted;
+            CardUpload.Trend = $"Total: {NetworkStats.FormatBytes(stats.TotalBytesSent)}";
+        }
+
+        if (CardUsage != null)
+        {
+            long total = stats.TotalBytesReceived + stats.TotalBytesSent;
+            CardUsage.Value = NetworkStats.FormatBytes(total);
+            CardUsage.Trend = "Session Total";
+        }
+    }
+    
+    private void UpdateChart(NetworkStats stats)
+    {
+        // Convert bytes per second to megabytes per second
+        double downloadMBps = stats.DownloadSpeedBytesPerSecond / (1024.0 * 1024.0);
+        double uploadMBps = stats.UploadSpeedBytesPerSecond / (1024.0 * 1024.0);
+        
+        _downloadSpeedHistory.Add(downloadMBps);
+        _uploadSpeedHistory.Add(uploadMBps);
+        
+        // Keep only last 60 data points
+        if (_downloadSpeedHistory.Count > 60) _downloadSpeedHistory.RemoveAt(0);
+        if (_uploadSpeedHistory.Count > 60) _uploadSpeedHistory.RemoveAt(0);
     }
 
-    private void MinimizeToTray_Click(object sender, RoutedEventArgs e)
+    private void NavList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        Hide();
+        // Navigation logic placeholder
+        if (NavList.SelectedItem is ListBoxItem item && item.Tag is string tag)
+        {
+            if (PageTitle != null) PageTitle.Text = tag;
+            
+            // TODO: Switch content based on tag
+        }
     }
 
-    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    private void ShowSettings_Click(object sender, RoutedEventArgs e)
     {
-        // Minimize to tray instead of closing
-        e.Cancel = true;
-        Hide();
+        // Delegate to App's ShowSettingsWindow which has access to services
+        var app = (App)Application.Current;
+        app.ShowSettingsWindow();
+    }
+
+    private void Exit_Click(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Shutdown();
     }
 }
