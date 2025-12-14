@@ -15,9 +15,9 @@ public partial class AnalyticsWindow : Window
     private DateTime _startDate;
     private DateTime _endDate;
 
-    public ISeries[] UsageTimeSeries { get; set; }
-    public ISeries[] UploadDownloadSeries { get; set; }
-    public ISeries[] PeakHoursSeries { get; set; }
+    public ISeries[] UsageTimeSeries { get; set; } = Array.Empty<ISeries>();
+    public ISeries[] UploadDownloadSeries { get; set; } = Array.Empty<ISeries>();
+    public ISeries[] PeakHoursSeries { get; set; } = Array.Empty<ISeries>();
 
     public AnalyticsWindow(DataLogger? dataLogger)
     {

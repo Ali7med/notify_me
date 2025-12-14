@@ -17,7 +17,7 @@ public class TrafficMonitor
     public event EventHandler<NetworkStats>? TrafficUpdated;
 
     public NetworkStats CurrentStats { get; private set; } = new NetworkStats();
-    public int UpdateIntervalMs { get; set; } = 1000;
+    public int UpdateIntervalMs { get; set; } = 2000; // Optimized: was 1000ms
 
     public TrafficMonitor(INetworkInterfaceWrapper networkInterfaceWrapper)
     {

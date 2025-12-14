@@ -10,6 +10,8 @@ public class ProcessMonitorService
     private readonly ConcurrentDictionary<int, ProcessNetworkStats> _processStats = new();
     private readonly Timer _monitorTimer;
     private bool _isMonitoring;
+    private DateTime _lastFullScan = DateTime.MinValue;
+    private const int FULL_SCAN_INTERVAL_SECONDS = 15; // Full scan every 15 seconds
 
     public event EventHandler<Dictionary<int, ProcessNetworkStats>>? StatsUpdated;
 
@@ -22,7 +24,7 @@ public class ProcessMonitorService
     {
         if (_isMonitoring) return;
         _isMonitoring = true;
-        _monitorTimer.Change(0, 3000); // Update every 3 seconds
+        _monitorTimer.Change(0, 5000); // Optimized: was 3000ms
     }
 
     public void Stop()
@@ -35,55 +37,73 @@ public class ProcessMonitorService
     {
         try
         {
-            var tcpConnections = GetAllTcpConnections();
-            var processGroups = tcpConnections.GroupBy(c => c.ProcessId);
+            var now = DateTime.Now;
+            bool isFullScan = (now - _lastFullScan).TotalSeconds >= FULL_SCAN_INTERVAL_SECONDS;
 
-            foreach (var group in processGroups)
+            if (isFullScan)
             {
-                try
-                {
-                    var processId = group.Key;
-                    if (processId == 0) continue;
+                // Full scan: Get all TCP connections (expensive)
+                var tcpConnections = GetAllTcpConnections();
+                var processGroups = tcpConnections.GroupBy(c => c.ProcessId);
 
-                    var process = Process.GetProcessById(processId);
-                    
-                    if (!_processStats.ContainsKey(processId))
+                foreach (var group in processGroups)
+                {
+                    try
                     {
-                        _processStats[processId] = new ProcessNetworkStats
-                        {
-                            ProcessId = processId,
-                            ProcessName = process.ProcessName,
-                            ExecutablePath = GetProcessPath(process),
-                            StartTime = process.StartTime,
-                            ConnectionCount = group.Count(),
-                            BytesSent = 0,
-                            BytesReceived = 0
-                        };
-                    }
-                    else
-                    {
-                        _processStats[processId].ConnectionCount = group.Count();
-                        _processStats[processId].LastActivity = DateTime.Now;
+                        var processId = group.Key;
+                        if (processId == 0) continue;
+
+                        var process = Process.GetProcessById(processId);
                         
-                        // Simulate data transfer (in real implementation, track actual bytes)
-                        _processStats[processId].BytesSent += group.Count() * 1024; // Simulate
-                        _processStats[processId].BytesReceived += group.Count() * 2048; // Simulate
+                        if (!_processStats.ContainsKey(processId))
+                        {
+                            _processStats[processId] = new ProcessNetworkStats
+                            {
+                                ProcessId = processId,
+                                ProcessName = process.ProcessName,
+                                ExecutablePath = GetProcessPath(process),
+                                StartTime = process.StartTime,
+                                ConnectionCount = group.Count(),
+                                BytesSent = 0,
+                                BytesReceived = 0
+                            };
+                        }
+                        else
+                        {
+                            _processStats[processId].ConnectionCount = group.Count();
+                            _processStats[processId].LastActivity = now;
+                            
+                            // Simulate data transfer (in real implementation, track actual bytes)
+                            _processStats[processId].BytesSent += group.Count() * 1024; // Simulate
+                            _processStats[processId].BytesReceived += group.Count() * 2048; // Simulate
+                        }
+                    }
+                    catch
+                    {
+                        // Skip processes we can't access
                     }
                 }
-                catch
+
+                // Clean up old processes (no connections in last 30 seconds)
+                var staleProcesses = _processStats.Where(p => 
+                    (now - p.Value.LastActivity).TotalSeconds > 30 &&
+                    !tcpConnections.Any(c => c.ProcessId == p.Key)).Select(p => p.Key).ToList();
+
+                foreach (var pid in staleProcesses)
                 {
-                    // Skip processes we can't access
+                    _processStats.TryRemove(pid, out _);
                 }
+
+                _lastFullScan = now;
             }
-
-            // Clean up old processes (no connections in last 30 seconds)
-            var staleProcesses = _processStats.Where(p => 
-                (DateTime.Now - p.Value.LastActivity).TotalSeconds > 30 &&
-                !tcpConnections.Any(c => c.ProcessId == p.Key)).Select(p => p.Key).ToList();
-
-            foreach (var pid in staleProcesses)
+            else
             {
-                _processStats.TryRemove(pid, out _);
+                // Quick update: just update LastActivity for existing processes
+                foreach (var stat in _processStats.Values)
+                {
+                    // Keep processes alive
+                    stat.LastActivity = now;
+                }
             }
 
             StatsUpdated?.Invoke(this, new Dictionary<int, ProcessNetworkStats>(_processStats));

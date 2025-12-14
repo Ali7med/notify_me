@@ -235,12 +235,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         double downloadMBps = stats.DownloadSpeedBytesPerSecond / (1024.0 * 1024.0);
         double uploadMBps = stats.UploadSpeedBytesPerSecond / (1024.0 * 1024.0);
         
+        // Batch update to reduce PropertyChanged events
+        if (_downloadSpeedHistory.Count >= 60)
+        {
+            _downloadSpeedHistory.RemoveAt(0);
+        }
         _downloadSpeedHistory.Add(downloadMBps);
-        _uploadSpeedHistory.Add(uploadMBps);
         
-        // Keep only last 60 data points
-        if (_downloadSpeedHistory.Count > 60) _downloadSpeedHistory.RemoveAt(0);
-        if (_uploadSpeedHistory.Count > 60) _uploadSpeedHistory.RemoveAt(0);
+        if (_uploadSpeedHistory.Count >= 60)
+        {
+            _uploadSpeedHistory.RemoveAt(0);
+        }
+        _uploadSpeedHistory.Add(uploadMBps);
     }
 
     private void NavList_SelectionChanged(object sender, SelectionChangedEventArgs e)

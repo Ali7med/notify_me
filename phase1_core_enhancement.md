@@ -73,33 +73,33 @@
 
 ---
 
-### 3. تتبع التطبيقات (Per-Application Tracking) ⭐⭐⭐⭐⭐
+### 3. تتبع التطبيقات (Per-Application Tracking) ⭐⭐⭐⭐⭐ ✅
 
 #### الوصف:
 نافذة/صفحة تعرض قائمة بجميع التطبيقات المستخدمة للإنترنت مع استهلاك كل منها.
 
 #### المتطلبات:
-- [ ] قائمة بجميع التطبيقات النشطة
-- [ ] لكل تطبيق:
+- [x] قائمة بجميع التطبيقات النشطة ✅
+- [x] لكل تطبيق: ✅
   - الأيقونة والاسم
   - استهلاك Upload/Download
   - عدد الاتصالات
   - آخر نشاط
-- [ ] إمكانية الفرز (حسب الاستهلاك، الاسم، النشاط)
-- [ ] إمكانية البحث
+- [x] إمكانية الفرز (حسب الاستهلاك، الاسم، النشاط) ✅
+- [x] إمكانية البحث ✅
 - [ ] رسم بياني لكل تطبيق (عند النقر)
-- [ ] تصنيف التطبيقات (Browsers, Games, System, etc.)
+- [x] تصنيف التطبيقات (Browsers, Games, System, etc.) ✅
 - [ ] إمكانية وضع علامات مخصصة
 
 #### التقنيات:
-- WMI (Windows Management Instrumentation)
-- Process Monitoring
-- Network Statistics API
+- ✅ WMI (Windows Management Instrumentation)
+- ✅ Process Monitoring
+- ✅ Network Statistics API
 
 #### الملفات الجديدة:
-- `NotifyMe.Core/Services/ProcessMonitorService.cs`
-- `NotifyMe.UI/Pages/ApplicationsPage.xaml`
-- `NotifyMe.Models/ProcessNetworkInfo.cs`
+- ✅ `NotifyMe.Core/Services/ProcessMonitorService.cs`
+- ✅ `NotifyMe.UI/ApplicationsWindow.xaml`
+- ✅ `NotifyMe.Models/ProcessNetworkInfo.cs`
 
 ---
 

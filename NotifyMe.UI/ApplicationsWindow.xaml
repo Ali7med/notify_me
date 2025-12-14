@@ -3,121 +3,349 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Applications - Network Monitor" 
-        Height="600" Width="900"
+        Height="700" Width="1100"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource MaterialDesignPaper}"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        TextElement.Foreground="#FFFFFF"
         FontFamily="{DynamicResource MaterialDesignFont}">
-    
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="Network Applications" FontSize="28" FontWeight="Bold"/>
-            <TextBlock Text="Monitor network usage per application" FontSize="14" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-        </StackPanel>
+    <Window.Resources>
+        <!-- Premium Colors -->
+        <SolidColorBrush x:Key="WindowBackground" Color="#0F0F0F"/>
+        <SolidColorBrush x:Key="CardBackground" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#4CC2FF"/>
+        
+        <!-- DataGrid Style -->
+        <Style x:Key="DataGridStyle" TargetType="DataGrid">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="RowBackground" Value="#1E1E1E"/>
+            <Setter Property="AlternatingRowBackground" Value="#252525"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="CanUserResizeRows" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+        </Style>
 
-        <!-- Search & Filter Bar -->
-        <Grid Grid.Row="1" Margin="0,0,0,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- DataGrid Header Style -->
+        <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#161616"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
 
-            <TextBox x:Name="SearchBox" 
-                     materialDesign:HintAssist.Hint="Search applications..."
-                     Style="{DynamicResource MaterialDesignOutlinedTextBox}"
-                     TextChanged="SearchBox_TextChanged"/>
+        <!-- DataGrid Cell Style -->
+        <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#2D2D2D"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
-                <ComboBox x:Name="SortComboBox" 
-                          Width="150"
-                          materialDesign:HintAssist.Hint="Sort by"
-                          SelectionChanged="SortComboBox_SelectionChanged">
-                    <ComboBoxItem Content="Name" Tag="Name"/>
-                    <ComboBoxItem Content="Data Usage" Tag="Usage" IsSelected="True"/>
-                    <ComboBoxItem Content="Connections" Tag="Connections"/>
-                    <ComboBoxItem Content="Last Activity" Tag="Activity"/>
-                </ComboBox>
-            </StackPanel>
+        <!-- Rating Star Style -->
+        <Style x:Key="RatingStarStyle" TargetType="materialDesign:PackIcon">
+            <Setter Property="Kind" Value="Star"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="Filled">
+                    <Setter Property="Foreground" Value="#FFC107"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <!-- Main Border with Glow -->
+    <Border Background="{StaticResource WindowBackground}" CornerRadius="16" BorderBrush="{StaticResource AccentColor}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#4CC2FF" BlurRadius="30" ShadowDepth="0" Opacity="0.6"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" Background="#161616" CornerRadius="16,16,0,0" BorderBrush="#333333" BorderThickness="0,0,0,1" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                        <materialDesign:PackIcon Kind="Apps" Width="20" Height="20" Foreground="{StaticResource AccentColor}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Network Applications" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Window Controls -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+                        <Button x:Name="MinimizeButton" Click="MinimizeButton_Click" Width="40" Height="40" Background="Transparent" BorderThickness="0">
+                            <materialDesign:PackIcon Kind="WindowMinimize" Width="16" Height="16" Foreground="#AAAAAA"/>
+                        </Button>
+                        <Button x:Name="CloseButton" Click="CloseButton_Click" Width="40" Height="40" Background="Transparent" BorderThickness="0">
+                            <materialDesign:PackIcon Kind="Close" Width="16" Height="16" Foreground="#FF5252"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content -->
+            <Grid Grid.Row="1" Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header Stats -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Total Apps Card -->
+                    <Border Grid.Column="0" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="ACTIVE APPS" FontSize="11" Foreground="#888888" FontWeight="Bold"/>
+                            <TextBlock x:Name="TotalAppsText" Text="0" FontSize="28" FontWeight="Bold" Foreground="White" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Total Upload Card -->
+                    <Border Grid.Column="1" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16" Margin="8,0">
+                        <StackPanel>
+                            <TextBlock Text="TOTAL UPLOAD" FontSize="11" Foreground="#888888" FontWeight="Bold"/>
+                            <TextBlock x:Name="TotalUploadText" Text="0 MB" FontSize="28" FontWeight="Bold" Foreground="#4CAF50" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Total Download Card -->
+                    <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16" Margin="8,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="TOTAL DOWNLOAD" FontSize="11" Foreground="#888888" FontWeight="Bold"/>
+                            <TextBlock x:Name="TotalDownloadText" Text="0 MB" FontSize="28" FontWeight="Bold" Foreground="#2196F3" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Search & Filter Bar -->
+                <Grid Grid.Row="1" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Search Box -->
+                    <Border Background="{StaticResource CardBackground}" CornerRadius="8" Padding="12,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <materialDesign:PackIcon Kind="Magnify" Width="20" Height="20" Foreground="#666666" VerticalAlignment="Center"/>
+                            <TextBox x:Name="SearchBox" Grid.Column="1" 
+                                     Background="Transparent" 
+                                     BorderThickness="0" 
+                                     Foreground="White"
+                                     Margin="8,0,0,0"
+                                     VerticalAlignment="Center"
+                                     FontSize="13"
+                                     TextChanged="SearchBox_TextChanged"/>
+                            <TextBlock Grid.Column="1" 
+                                       Text="Search applications..." 
+                                       Foreground="#666666" 
+                                       Margin="8,0,0,0"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+
+                    <!-- Category Filter -->
+                    <ComboBox x:Name="CategoryFilter" Grid.Column="1" Width="150" Margin="12,0,0,0" 
+                              Background="{StaticResource CardBackground}" 
+                              Foreground="White"
+                              SelectionChanged="CategoryFilter_SelectionChanged">
+                        <ComboBoxItem Content="All Categories" IsSelected="True"/>
+                        <ComboBoxItem Content="Browser"/>
+                        <ComboBoxItem Content="Gaming"/>
+                        <ComboBoxItem Content="Communication"/>
+                        <ComboBoxItem Content="System"/>
+                        <ComboBoxItem Content="Download"/>
+                        <ComboBoxItem Content="Other"/>
+                    </ComboBox>
+                </Grid>
+
+                <!-- Applications DataGrid -->
+                <Border Grid.Row="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="0">
+                    <DataGrid x:Name="ApplicationsDataGrid" 
+                              Style="{StaticResource DataGridStyle}"
+                              ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                              CellStyle="{StaticResource DataGridCellStyle}"
+                              Sorting="ApplicationsDataGrid_Sorting"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              VirtualizingPanel.CacheLength="20"
+                              VirtualizingPanel.CacheLengthUnit="Item"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True">
+                        
+                        <DataGrid.Columns>
+                            <!-- Application Name with Icon -->
+                            <DataGridTemplateColumn Header="Application" Width="2*" CanUserSort="True" SortMemberPath="ProcessName">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding IconSource}" Width="24" Height="24" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding ProcessName}" FontSize="13" VerticalAlignment="Center" Foreground="White"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Connections -->
+                            <DataGridTextColumn Header="Connections" Binding="{Binding ConnectionCount}" Width="*" CanUserSort="True"/>
+
+                            <!-- Upload -->
+                            <DataGridTemplateColumn Header="Upload" Width="*" CanUserSort="True" SortMemberPath="BytesSent">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding BytesSentFormatted}" Foreground="#4CAF50" FontWeight="SemiBold"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Download -->
+                            <DataGridTemplateColumn Header="Download" Width="*" CanUserSort="True" SortMemberPath="BytesReceived">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding BytesReceivedFormatted}" Foreground="#2196F3" FontWeight="SemiBold"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Category -->
+                            <DataGridTemplateColumn Header="Category" Width="*" CanUserSort="True" SortMemberPath="Category">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#333333" CornerRadius="4" Padding="8,4">
+                                            <TextBlock Text="{Binding Category}" FontSize="11" Foreground="White" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Rating -->
+                            <DataGridTemplateColumn Header="Rating" Width="120" CanUserSort="True" SortMemberPath="UserRating">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <materialDesign:PackIcon Kind="Star" Width="14" Height="14" Foreground="{Binding Star1Color}" Margin="2" MouseLeftButtonDown="Star_Click" Tag="1"/>
+                                            <materialDesign:PackIcon Kind="Star" Width="14" Height="14" Foreground="{Binding Star2Color}" Margin="2" MouseLeftButtonDown="Star_Click" Tag="2"/>
+                                            <materialDesign:PackIcon Kind="Star" Width="14" Height="14" Foreground="{Binding Star3Color}" Margin="2" MouseLeftButtonDown="Star_Click" Tag="3"/>
+                                            <materialDesign:PackIcon Kind="Star" Width="14" Height="14" Foreground="{Binding Star4Color}" Margin="2" MouseLeftButtonDown="Star_Click" Tag="4"/>
+                                            <materialDesign:PackIcon Kind="Star" Width="14" Height="14" Foreground="{Binding Star5Color}" Margin="2" MouseLeftButtonDown="Star_Click" Tag="5"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Status -->
+                            <DataGridTemplateColumn Header="Status" Width="100" CanUserSort="True" SortMemberPath="IsBlocked">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#333333" CornerRadius="4" Padding="8,4">
+                                            <TextBlock Text="{Binding BlockStatusText}" 
+                                                       FontSize="11" 
+                                                       Foreground="{Binding BlockStatusColor}" 
+                                                       FontWeight="Bold"
+                                                       HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Actions -->
+                            <DataGridTemplateColumn Header="Actions" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{Binding BlockButtonText}" 
+                                                Click="ToggleBlock_Click"
+                                                Background="#333333"
+                                                Foreground="White"
+                                                BorderThickness="0"
+                                                Padding="12,6"
+                                                FontSize="11"
+                                                Cursor="Hand">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border x:Name="border" 
+                                                                        Background="{TemplateBinding Background}" 
+                                                                        CornerRadius="4" 
+                                                                        Padding="{TemplateBinding Padding}">
+                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="border" Property="Background" Value="#4CC2FF"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Last Activity -->
+                            <DataGridTextColumn Header="Last Activity" Binding="{Binding LastActivityFormatted}" Width="*" CanUserSort="True" SortMemberPath="LastActivity"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </Grid>
         </Grid>
-
-        <!-- Applications List -->
-        <DataGrid x:Name="ApplicationsDataGrid" 
-                  Grid.Row="2"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  SelectionMode="Single"
-                  GridLinesVisibility="Horizontal"
-                  HeadersVisibility="Column"
-                  AlternatingRowBackground="{DynamicResource MaterialDesignDivider}">
-            <DataGrid.Columns>
-                <!-- Application Name with Icon -->
-                <DataGridTemplateColumn Header="Application" Width="2*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Application" 
-                                                       Width="24" Height="24" 
-                                                       Margin="0,0,10,0"
-                                                       VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding ProcessName}" FontSize="14" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <!-- Connections -->
-                <DataGridTextColumn Header="Connections" 
-                                  Binding="{Binding ConnectionCount}" 
-                                  Width="*"/>
-
-                <!-- Data Sent -->
-                <DataGridTemplateColumn Header="Sent" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding BytesSentFormatted}" Foreground="#4CAF50"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <!-- Data Received -->
-                <DataGridTemplateColumn Header="Received" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding BytesReceivedFormatted}" Foreground="#2196F3"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <!-- Last Activity -->
-                <DataGridTextColumn Header="Last Activity" 
-                                  Binding="{Binding LastActivityFormatted}" 
-                                  Width="*"/>
-
-                <!-- Category -->
-                <DataGridTemplateColumn Header="Category" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border Background="{DynamicResource PrimaryHueMidBrush}" 
-                                  CornerRadius="3" 
-                                  Padding="5,2">
-                                <TextBlock Text="{Binding Category}" 
-                                         FontSize="10" 
-                                         Foreground="White"
-                                         HorizontalAlignment="Center"/>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+    </Border>
 </Window>
