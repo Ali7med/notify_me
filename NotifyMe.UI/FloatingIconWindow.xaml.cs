@@ -130,11 +130,21 @@ namespace NotifyMe.UI
                 return;
             }
 
-            if (MainBorder.Background is SolidColorBrush brush)
+            // Apply Theme and Opacity
+            if (settings.Theme == "Classic")
             {
-                // Create a new brush to avoid freezing issues if it's frozen
-                var newBrush = new SolidColorBrush(brush.Color) { Opacity = settings.Opacity };
-                MainBorder.Background = newBrush;
+                // Classic: Solid Black, No Transparency
+                MainBorder.Background = new SolidColorBrush(Color.FromRgb(10, 10, 10)) { Opacity = 1.0 };
+                MainBorder.BorderThickness = new Thickness(1);
+                GlowBorder.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                // Glass: Dark Gray, User-defined Transparency
+                var glassColor = Color.FromRgb(30, 30, 30); // #1E1E1E
+                MainBorder.Background = new SolidColorBrush(glassColor) { Opacity = settings.Opacity };
+                MainBorder.BorderThickness = new Thickness(1);
+                GlowBorder.Visibility = Visibility.Visible;
             }
             
             _networkMonitor.PingHost = settings.PingHost;

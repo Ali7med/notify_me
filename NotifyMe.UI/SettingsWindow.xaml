@@ -146,6 +146,136 @@
             </Setter>
         </Style>
 
+        <!-- ComboBox Toggle Button Template -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="32" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="Border" 
+                        Grid.ColumnSpan="2"
+                        CornerRadius="6"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}" />
+                <Path x:Name="Arrow" 
+                      Grid.Column="1" 
+                      HorizontalAlignment="Center" 
+                      VerticalAlignment="Center"
+                      Data="M0,0 L4,4 L8,0"
+                      Stroke="{StaticResource TextSecondary}"
+                      StrokeThickness="1.5"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="Border" Property="Background" Value="#333333" />
+                    <Setter TargetName="Arrow" Property="Stroke" Value="White" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Background" Value="#252525"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton" 
+                                          Template="{StaticResource ComboBoxToggleButton}" 
+                                          Grid.Column="2" 
+                                          Focusable="false"
+                                          IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <ContentPresenter Name="ContentSite"
+                                              IsHitTestVisible="False" 
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="15,3,23,3"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left" />
+                            <Popup Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True" 
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="#252525"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource BorderColor}"
+                                            CornerRadius="8"
+                                            Margin="0,4,0,0">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.3" Color="Black"/>
+                                        </Border.Effect>
+                                        <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ComboBoxItem Style -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="4"
+                                Margin="2">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#353535"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackground}" CornerRadius="16" BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
@@ -205,27 +335,29 @@
                     <!-- Appearance View -->
                     <ScrollViewer x:Name="ViewAppearance" VerticalScrollBarVisibility="Auto" Visibility="Visible">
                         <StackPanel>
-                            <!-- Transparency -->
+                            <!-- Appearance Settings (Combined) -->
                             <Border Style="{StaticResource CardStyle}">
                                 <StackPanel>
-                                    <TextBlock Text="Widget Transparency" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
-                                    <Grid Margin="0,0,0,12">
-                                        <TextBlock Text="Opacity Level" Foreground="{StaticResource TextSecondary}"/>
-                                        <TextBlock Text="{Binding ElementName=OpacitySlider, Path=Value, StringFormat=P0}" HorizontalAlignment="Right" Foreground="{StaticResource AccentColor}" FontWeight="Bold"/>
-                                    </Grid>
-                                    <Slider x:Name="OpacitySlider" Minimum="0.1" Maximum="1.0" Value="0.8" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Theme -->
-                            <Border Style="{StaticResource CardStyle}">
-                                <StackPanel>
+                                    <!-- Theme Style -->
                                     <TextBlock Text="Theme Style" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
                                     <ComboBox x:Name="ThemeComboBox" Height="40" FontSize="14" Padding="10,0" SelectionChanged="ThemeComboBox_SelectionChanged">
                                         <ComboBoxItem Content="✨ Glass (Modern)"/>
                                         <ComboBoxItem Content="⬛ Classic (Solid)"/>
                                     </ComboBox>
-                                    <TextBlock Text="Select your preferred visual style for the widget." Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,12,0,0"/>
+                                    <TextBlock Text="Select your preferred visual style for the widget." Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,8,0,24"/>
+
+                                    <!-- Divider -->
+                                    <Border Height="1" Background="#333333" Margin="0,0,0,24"/>
+
+                                    <!-- Widget Transparency -->
+                                    <StackPanel x:Name="TransparencyPanel">
+                                        <TextBlock Text="Widget Transparency" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                                        <Grid Margin="0,0,0,12">
+                                            <TextBlock Text="Opacity Level" Foreground="{StaticResource TextSecondary}"/>
+                                            <TextBlock Text="{Binding ElementName=OpacitySlider, Path=Value, StringFormat=P0}" HorizontalAlignment="Right" Foreground="{StaticResource AccentColor}" FontWeight="Bold"/>
+                                        </Grid>
+                                        <Slider x:Name="OpacitySlider" Minimum="0.1" Maximum="1.0" Value="0.8" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="OpacitySlider_ValueChanged"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
 

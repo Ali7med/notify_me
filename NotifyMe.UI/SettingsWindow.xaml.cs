@@ -46,11 +46,22 @@ namespace NotifyMe.UI
             InitializeUI();
         }
 
+        private bool _isInitializing = true;
+
         private void InitializeUI()
         {
+            _isInitializing = true;
+
             // Appearance
             OpacitySlider.Value = _tempSettings.Opacity;
             ThemeComboBox.SelectedIndex = _tempSettings.Theme == "Glass" ? 0 : 1;
+            
+            // Initial state for Opacity Slider
+            if (TransparencyPanel != null)
+            {
+                TransparencyPanel.IsEnabled = (_tempSettings.Theme == "Glass");
+                TransparencyPanel.Opacity = (_tempSettings.Theme == "Glass") ? 1.0 : 0.5;
+            }
 
             // Language
             LanguageComboBox.Items.Clear();
@@ -106,6 +117,8 @@ namespace NotifyMe.UI
                 _ => 1
             };
             RunAtStartupCheckBox.IsChecked = _tempSettings.StartWithWindows;
+
+            _isInitializing = false;
         }
 
         private void NavList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -142,6 +155,8 @@ namespace NotifyMe.UI
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (_isInitializing) return;
+
             if (_tempSettings != null)
             {
                 _tempSettings.Opacity = e.NewValue;
@@ -151,9 +166,20 @@ namespace NotifyMe.UI
 
         private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (_isInitializing) return;
+
             if (_tempSettings != null && ThemeComboBox.SelectedItem is ComboBoxItem item)
             {
-                _tempSettings.Theme = item.Content?.ToString()?.Contains("Glass") == true ? "Glass" : "Classic";
+                var theme = item.Content?.ToString()?.Contains("Glass") == true ? "Glass" : "Classic";
+                _tempSettings.Theme = theme;
+                
+                // Enable/Disable Opacity Slider
+                if (TransparencyPanel != null)
+                {
+                    TransparencyPanel.IsEnabled = (theme == "Glass");
+                    TransparencyPanel.Opacity = (theme == "Glass") ? 1.0 : 0.5;
+                }
+
                 _settingsService.SaveSettings(_tempSettings);
             }
         }
