@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using NotifyMe.Core.Services;
 using NotifyMe.Models;
+using NotifyMe.UI.Services;
 
 namespace NotifyMe.UI
 {
@@ -12,13 +13,17 @@ namespace NotifyMe.UI
     {
         private readonly SettingsService _settingsService;
         private readonly AutoStartService _autoStartService;
+        private readonly NotificationService _notificationService;
+        private readonly SoundService _soundService;
         private UserSettings _tempSettings;
 
-        public SettingsWindow(SettingsService settingsService, AutoStartService autoStartService)
+        public SettingsWindow(SettingsService settingsService, AutoStartService autoStartService, NotificationService notificationService, SoundService soundService)
         {
             InitializeComponent();
             _settingsService = settingsService;
             _autoStartService = autoStartService;
+            _notificationService = notificationService;
+            _soundService = soundService;
             
             // Clone current settings for temporary editing
             var current = _settingsService.CurrentSettings;
@@ -43,7 +48,14 @@ namespace NotifyMe.UI
                 Language = current.Language
             };
 
-            InitializeUI();
+            try
+            {
+                InitializeUI();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error initializing Settings UI: {ex.Message}\n\n{ex.StackTrace}", "Settings Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private bool _isInitializing = true;
@@ -117,6 +129,13 @@ namespace NotifyMe.UI
                 _ => 1
             };
             RunAtStartupCheckBox.IsChecked = _tempSettings.StartWithWindows;
+
+            // Do Not Disturb
+            if (DNDCheckBox != null) DNDCheckBox.IsChecked = _tempSettings.EnableDND;
+            if (DNDScheduleCheckBox != null) DNDScheduleCheckBox.IsChecked = _tempSettings.EnableDNDSchedule;
+            if (DNDStartBox != null) DNDStartBox.Text = _tempSettings.DNDStartTime.ToString(@"hh\:mm");
+            if (DNDEndBox != null) DNDEndBox.Text = _tempSettings.DNDEndTime.ToString(@"hh\:mm");
+            if (DNDSchedulePanel != null) DNDSchedulePanel.Visibility = _tempSettings.EnableDNDSchedule ? Visibility.Visible : Visibility.Collapsed;
 
             _isInitializing = false;
         }
@@ -222,6 +241,15 @@ namespace NotifyMe.UI
                     _tempSettings.CustomNotificationPosition = selectedPosition.Tag?.ToString() ?? "TopRight";
                 }
 
+                // Do Not Disturb
+                _tempSettings.EnableDND = DNDCheckBox.IsChecked ?? false;
+                _tempSettings.EnableDNDSchedule = DNDScheduleCheckBox.IsChecked ?? false;
+                if (TimeSpan.TryParse(DNDStartBox.Text, out var start)) _tempSettings.DNDStartTime = start;
+                else _tempSettings.DNDStartTime = new TimeSpan(22, 0, 0); // Default if invalid
+
+                if (TimeSpan.TryParse(DNDEndBox.Text, out var end)) _tempSettings.DNDEndTime = end;
+                else _tempSettings.DNDEndTime = new TimeSpan(7, 0, 0); // Default if invalid
+
                 // Language
                 if (LanguageComboBox.SelectedItem is ComboBoxItem selectedLang)
                 {
@@ -281,6 +309,67 @@ namespace NotifyMe.UI
         {
             if (CustomPositionPanel != null)
                 CustomPositionPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void TestNotification_Click(object sender, RoutedEventArgs e)
+        {
+            if (_notificationService != null)
+            {
+                // Temporarily apply current UI settings to test what's selected
+                var tempSettings = _settingsService.CurrentSettings; // Use current saved settings for test
+                
+                // Override with UI state if needed, but for now let's test the service directly
+                _notificationService.ShowCustomNotification("Test Notification", "This is a test notification from NotifyMe.");
+                
+                // Also try standard toast if selected
+                if (ToastNotificationRadio.IsChecked == true)
+                {
+                     new Microsoft.Toolkit.Uwp.Notifications.ToastContentBuilder()
+                    .AddText("Test Notification")
+                    .AddText("This is a standard Windows Toast notification.")
+                    .Show();
+                }
+            }
+        }
+
+        private void TestSound_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 1. System Beep (Hardware/OS)
+                System.Media.SystemSounds.Beep.Play();
+                
+                if (_soundService != null)
+                {
+                    // Ensure enabled for test
+                    var wasEnabled = _soundService.IsEnabled;
+                    _soundService.IsEnabled = true;
+                    
+                    // 2. Service Sound
+                    _soundService.PlayConnectionLost();
+                    
+                    _soundService.IsEnabled = wasEnabled; // Restore state
+                }
+                else
+                {
+                    MessageBox.Show("Sound Service is not initialized!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Sound Test Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void DNDCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            // Toggle logic if needed in real-time
+        }
+
+        private void DNDScheduleCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (DNDSchedulePanel != null)
+                DNDSchedulePanel.Visibility = (DNDScheduleCheckBox.IsChecked == true) ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

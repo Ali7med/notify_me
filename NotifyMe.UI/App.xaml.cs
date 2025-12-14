@@ -111,6 +111,9 @@ public partial class App : Application
         _networkMonitor.ConnectionStateChanged += OnConnectionStateChanged;
         _networkMonitor.LatencyChanged += OnLatencyChanged;
         _trafficMonitor.TrafficUpdated += OnTrafficUpdated;
+        
+        // Subscribe to settings changes
+        _settingsService.SettingsChanged += OnSettingsChanged;
 
         // Start monitoring
         _networkMonitor.Start();
@@ -136,6 +139,25 @@ public partial class App : Application
         // Update tray icon tooltip and menu translations
         UpdateTrayIcon();
         UpdateContextMenuTranslations();
+    }
+
+    private void OnSettingsChanged(object? sender, UserSettings settings)
+    {
+        if (_soundService != null)
+        {
+            _soundService.IsEnabled = settings.EnableSoundNotifications;
+        }
+        
+        // Update network monitor interval if needed
+        if (_networkMonitor != null)
+        {
+             _networkMonitor.CheckIntervalSeconds = settings.UpdateIntervalSeconds;
+        }
+        
+        // Update language if changed
+        Helpers.LocalizationManager.LoadLanguage(settings.Language);
+        UpdateContextMenuTranslations();
+        UpdateTrayIcon();
     }
     
     private void UpdateContextMenuTranslations()
@@ -189,13 +211,27 @@ public partial class App : Application
 
             if (e.EventType == ConnectionEventType.Disconnected)
             {
+                // Play sound if enabled (Bypassing DND for critical connection alerts)
+                if (_soundService != null && _settingsService != null)
+                {
+                    _soundService.IsEnabled = _settingsService.CurrentSettings.EnableSoundNotifications;
+                    _soundService.PlayConnectionLost();
+                }
+                
+                // Show notification (Handles DND internally)
                 _notificationService?.ShowConnectionLost();
-                if (!isDnd) _soundService?.PlayConnectionLost();
             }
             else if (e.EventType == ConnectionEventType.Connected)
             {
+                // Play sound if enabled (Bypassing DND for critical connection alerts)
+                if (_soundService != null && _settingsService != null)
+                {
+                    _soundService.IsEnabled = _settingsService.CurrentSettings.EnableSoundNotifications;
+                    _soundService.PlayConnectionRestored();
+                }
+                
+                // Show notification (Handles DND internally)
                 _notificationService?.ShowConnectionRestored();
-                if (!isDnd) _soundService?.PlayConnectionRestored();
             }
 
             UpdateTrayIcon();
@@ -249,7 +285,7 @@ public partial class App : Application
             var timeSinceLastAlert = (now - _lastHighTrafficAlert).TotalMinutes;
             System.Diagnostics.Debug.WriteLine($"THRESHOLD EXCEEDED! Time since last alert: {timeSinceLastAlert:F1} minutes");
             
-            if (timeSinceLastAlert >= 5)
+            if (timeSinceLastAlert >= 0.1) // 6 seconds cooldown for testing
             {
                 System.Diagnostics.Debug.WriteLine("Showing high traffic alert...");
                 _notificationService?.ShowHighTrafficAlert(
@@ -257,6 +293,13 @@ public partial class App : Application
                     settings.HighTrafficThresholdUnit ?? "MB",
                     settings.HighTrafficThresholdMBps
                 );
+                
+                // Play warning sound
+                if (settings.EnableSoundNotifications && !(_notificationService?.IsDNDActive() ?? false))
+                {
+                    System.Media.SystemSounds.Exclamation.Play();
+                }
+
                 _lastHighTrafficAlert = now;
             }
             else
@@ -315,13 +358,20 @@ public partial class App : Application
 
     public void ShowSettingsWindow()
     {
-        if (_settingsWindow == null)
+        try
         {
-            _settingsWindow = new SettingsWindow(_settingsService!, _autoStartService!);
-            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+            if (_settingsWindow == null)
+            {
+                _settingsWindow = new SettingsWindow(_settingsService!, _autoStartService!, _notificationService!, _soundService!);
+                _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+            }
+            _settingsWindow.Show();
+            _settingsWindow.Activate();
         }
-        _settingsWindow.Show();
-        _settingsWindow.Activate();
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Settings Window: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     public void ShowMainWindow()

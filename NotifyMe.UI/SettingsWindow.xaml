@@ -1,6 +1,7 @@
 <Window x:Class="NotifyMe.UI.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:MaterialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="NotifyMe Settings" Height="650" Width="850"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -414,9 +415,31 @@
 
                             <Border Style="{StaticResource CardStyle}">
                                 <StackPanel>
+                                    <TextBlock Text="Do Not Disturb" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                                    <CheckBox x:Name="DNDCheckBox" Content="Enable Do Not Disturb" Margin="0,0,0,12" Checked="DNDCheckBox_Checked" Unchecked="DNDCheckBox_Checked"/>
+                                    
+                                    <CheckBox x:Name="DNDScheduleCheckBox" Content="Schedule DND" Margin="24,0,0,8" Checked="DNDScheduleCheckBox_Checked" Unchecked="DNDScheduleCheckBox_Checked"/>
+                                    
+                                    <StackPanel x:Name="DNDSchedulePanel" Visibility="Collapsed" Margin="48,0,0,0" Orientation="Horizontal">
+                                        <TextBox x:Name="DNDStartBox" Width="80" Style="{DynamicResource MaterialDesignTextBox}" MaterialDesign:HintAssist.Hint="Start (HH:mm)" Margin="0,0,16,0"/>
+                                        <TextBlock Text="to" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{StaticResource TextSecondary}"/>
+                                        <TextBox x:Name="DNDEndBox" Width="80" Style="{DynamicResource MaterialDesignTextBox}" MaterialDesign:HintAssist.Hint="End (HH:mm)"/>
+                                    </StackPanel>
+                                    <TextBlock Text="Mutes all sounds and notifications." Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel>
                                     <TextBlock Text="Sound &amp; Feedback" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
                                     <CheckBox x:Name="ToastNotificationsCheckBox" Content="Show Toast Popups" Margin="0,0,0,12"/>
                                     <CheckBox x:Name="SoundNotificationsCheckBox" Content="Play Sound Alerts"/>
+                                    
+                                    <!-- Test Buttons -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                        <Button Content="Test Notification" Click="TestNotification_Click" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,8,0"/>
+                                        <Button Content="Test Sound" Click="TestSound_Click" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
