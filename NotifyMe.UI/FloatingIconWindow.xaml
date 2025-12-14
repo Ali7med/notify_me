@@ -12,14 +12,6 @@
         MouseEnter="Window_MouseEnter"
         MouseLeave="Window_MouseLeave">
     
-    <Window.Resources>
-        <Style TargetType="MenuItem">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Padding" Value="5,2"/>
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-        </Style>
-    </Window.Resources>
-
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard>

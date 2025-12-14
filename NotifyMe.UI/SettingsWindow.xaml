@@ -11,7 +11,8 @@
         MouseDown="Window_MouseDown">
 
     <Window.Resources>
-        <!-- Color Palette -->
+
+            <!-- Color Palette -->
         <SolidColorBrush x:Key="WindowBackground" Color="#121212"/>
         <SolidColorBrush x:Key="SidebarBackground" Color="#1E1E1E"/>
         <SolidColorBrush x:Key="ContentBackground" Color="#121212"/>
@@ -26,6 +27,38 @@
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        </Style>
+        
+        <!-- Custom Button Style (Mimics MaterialDesignRaisedButton) -->
+        <Style x:Key="MaterialDesignRaisedButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="16,6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource AccentHoverColor}"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#333333"/>
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- Navigation ListBoxItem Style -->
@@ -437,8 +470,8 @@
                                     
                                     <!-- Test Buttons -->
                                     <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                                        <Button Content="Test Notification" Click="TestNotification_Click" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,8,0"/>
-                                        <Button Content="Test Sound" Click="TestSound_Click" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                                        <Button Content="Test Notification" Click="TestNotification_Click" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="0,0,8,0"/>
+                                        <Button Content="Test Sound" Click="TestSound_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
