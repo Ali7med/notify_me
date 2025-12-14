@@ -8,13 +8,92 @@
         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         mc:Ignorable="d"
         Title="NotifyMe - Network Monitor" 
-        Height="768" Width="1280"
+        Height="800" Width="1280"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource MaterialDesignPaper}"
+        Background="#0F0F0F"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="14"
         FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <Window.Resources>
+        <!-- Premium Colors & Gradients -->
+        <SolidColorBrush x:Key="SidebarBackground" Color="#161616"/>
+        <SolidColorBrush x:Key="CardBackground" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="CardBorder" Color="#333333"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#4CC2FF"/>
+        <SolidColorBrush x:Key="SecondaryAccent" Color="#BB86FC"/>
+        
+        <!-- Premium Card Style -->
+        <Style x:Key="PremiumCard" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.3" Color="Black"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Navigation Item Style -->
+        <Style x:Key="NavListBoxItem" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="12,4"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Border" CornerRadius="12" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#2D2D2D"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#252525"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Sidebar Button Style -->
+        <Style x:Key="SidebarButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12" Padding="16,0">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#252525"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                             <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#333333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
     
     <Grid>
         <Grid.ColumnDefinitions>
@@ -23,7 +102,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="{DynamicResource MaterialDesignCardBackground}" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="{StaticResource SidebarBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -32,68 +111,48 @@
                 </Grid.RowDefinitions>
 
                 <!-- Brand -->
-                <StackPanel Grid.Row="0" Margin="24,40,24,40">
+                <StackPanel Grid.Row="0" Margin="32,48,32,48">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="AccessPointNetwork" Width="32" Height="32" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                        <TextBlock Text="NotifyMe" FontSize="24" FontWeight="Bold" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                        <Border Width="40" Height="40" CornerRadius="12" Background="{StaticResource AccentColor}">
+                            <materialDesign:PackIcon Kind="AccessPointNetwork" Width="24" Height="24" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="NotifyMe" FontSize="20" FontWeight="Bold" Foreground="White" FontFamily="Segoe UI Variable Display"/>
+                            <TextBlock Text="PREMIUM" FontSize="10" FontWeight="Bold" Foreground="{StaticResource SecondaryAccent}"/>
+                        </StackPanel>
                     </StackPanel>
-                    <TextBlock Text="Network Monitor" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}" Margin="44,4,0,0"/>
                 </StackPanel>
 
                 <!-- Navigation -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
                     <StackPanel>
-                        <ListBox x:Name="NavList" SelectionChanged="NavList_SelectionChanged" SelectedIndex="0" Background="Transparent" BorderThickness="0">
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="Padding" Value="16,12"/>
-                                    <Setter Property="Margin" Value="12,4"/>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="ListBoxItem">
-                                                <Border x:Name="Border" CornerRadius="8" Background="Transparent" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsSelected" Value="True">
-                                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
-                                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
-                                                    </Trigger>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignSelection}"/>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
+                        <ListBox x:Name="NavList" SelectionChanged="NavList_SelectionChanged" SelectedIndex="0" Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource NavListBoxItem}">
                             
                             <ListBoxItem Tag="Dashboard">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24" Margin="0,0,16,0"/>
-                                    <TextBlock Text="Dashboard" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="Dashboard" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </ListBoxItem>
                             
                             <ListBoxItem Tag="Applications">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="Apps" Width="24" Height="24" Margin="0,0,16,0"/>
-                                    <TextBlock Text="Applications" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="Applications" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </ListBoxItem>
                             
                             <ListBoxItem Tag="Analytics">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="ChartBox" Width="24" Height="24" Margin="0,0,16,0"/>
-                                    <TextBlock Text="Analytics" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="Analytics" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </ListBoxItem>
                             
                             <ListBoxItem Tag="History">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="History" Width="24" Height="24" Margin="0,0,16,0"/>
-                                    <TextBlock Text="History" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="History" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </ListBoxItem>
                         </ListBox>
@@ -101,24 +160,21 @@
                 </ScrollViewer>
 
                 <!-- Bottom Actions -->
-                <StackPanel Grid.Row="2" Margin="12,0,12,24">
-                    <Separator Background="{DynamicResource MaterialDesignDivider}" Margin="12,0,12,12"/>
-                    
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" 
-                            HorizontalContentAlignment="Left" Padding="16,12" Height="Auto"
-                            Click="ShowSettings_Click" Margin="0,0,0,4">
+                <StackPanel Grid.Row="2" Margin="24">
+                     <Button Style="{StaticResource SidebarButton}" 
+                             Click="ShowSettings_Click">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Cog" Width="22" Height="22" Margin="0,0,16,0"/>
-                            <TextBlock Text="Settings" VerticalAlignment="Center"/>
+                            <materialDesign:PackIcon Kind="Cog" Width="20" Height="20" Margin="0,0,12,0"/>
+                            <TextBlock Text="Settings"/>
                         </StackPanel>
                     </Button>
                     
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" 
-                            HorizontalContentAlignment="Left" Padding="16,12" Height="Auto"
+                    <Button Style="{StaticResource SidebarButton}" 
+                            Foreground="#FF5252"
                             Click="Exit_Click">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="ExitToApp" Width="22" Height="22" Margin="0,0,16,0"/>
-                            <TextBlock Text="Exit" VerticalAlignment="Center"/>
+                            <materialDesign:PackIcon Kind="Power" Width="20" Height="20" Margin="0,0,12,0"/>
+                            <TextBlock Text="Exit App"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -126,212 +182,178 @@
         </Border>
 
         <!-- Main Content -->
-        <Grid Grid.Column="1" Margin="32">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="48">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <Grid Grid.Row="0" Margin="0,0,0,32">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <StackPanel>
-                    <TextBlock x:Name="PageTitle" Text="Dashboard" Style="{DynamicResource MaterialDesignHeadline4TextBlock}" FontWeight="Bold"/>
-                    <TextBlock Text="Real-time network monitoring overview" Style="{DynamicResource MaterialDesignBody1TextBlock}" Foreground="{DynamicResource MaterialDesignBodyLight}" Margin="0,4,0,0"/>
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <materialDesign:PopupBox PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
-                        <materialDesign:PopupBox.ToggleContent>
-                            <materialDesign:PackIcon Kind="DotsVertical" Width="24" Height="24" Foreground="{DynamicResource MaterialDesignBody}"/>
-                        </materialDesign:PopupBox.ToggleContent>
-                        <StackPanel Width="150">
-                            <Button Content="Refresh Data"/>
-                            <Button Content="Export Report"/>
-                            <Separator/>
-                            <Button Content="Help &amp; Support"/>
+                <!-- Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,48">
+                    <StackPanel>
+                        <TextBlock x:Name="PageTitle" Text="Dashboard" FontSize="32" FontWeight="Bold" Foreground="White" FontFamily="Segoe UI Variable Display"/>
+                        <TextBlock Text="Real-time network performance monitor" FontSize="16" Foreground="#888888" Margin="0,8,0,0"/>
+                    </StackPanel>
+                    
+                    <!-- Quick Toggle -->
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Top" Padding="12,8" CornerRadius="20" Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#4CAF50" Margin="0,0,8,0"/>
+                            <TextBlock Text="Monitoring Active" Foreground="#4CAF50" FontSize="12" FontWeight="SemiBold"/>
                         </StackPanel>
-                    </materialDesign:PopupBox>
-                </StackPanel>
-            </Grid>
-
-            <!-- Dashboard Content -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,16,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Stats Cards -->
-                    <Grid Grid.Row="0" Margin="0,0,0,24">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Download Card -->
-                        <materialDesign:Card Grid.Column="0" Margin="0,0,12,0" Padding="20" UniformCornerRadius="12" materialDesign:ElevationAssist.Elevation="Dp2">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <materialDesign:PackIcon Kind="ArrowDown" Foreground="#4CAF50" VerticalAlignment="Center"/>
-                                    <TextBlock Text="12%" Foreground="#4CAF50" FontSize="12" Margin="4,0,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#E3F2FD" CornerRadius="8" Padding="8">
-                                        <materialDesign:PackIcon Kind="Download" Width="24" Height="24" Foreground="#2196F3"/>
-                                    </Border>
-                                    <TextBlock Text="DOWNLOAD" VerticalAlignment="Center" Margin="12,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                </StackPanel>
-                                <TextBlock x:Name="DownloadSpeedText" Grid.Row="1" Text="0.0 MB/s" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,16,0,4"/>
-                                <TextBlock Grid.Row="2" Text="Total: 1.2 GB" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            </Grid>
-                        </materialDesign:Card>
-
-                        <!-- Upload Card -->
-                        <materialDesign:Card Grid.Column="1" Margin="12,0,12,0" Padding="20" UniformCornerRadius="12" materialDesign:ElevationAssist.Elevation="Dp2">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <materialDesign:PackIcon Kind="ArrowUp" Foreground="#F44336" VerticalAlignment="Center"/>
-                                    <TextBlock Text="5%" Foreground="#F44336" FontSize="12" Margin="4,0,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#E8F5E9" CornerRadius="8" Padding="8">
-                                        <materialDesign:PackIcon Kind="Upload" Width="24" Height="24" Foreground="#4CAF50"/>
-                                    </Border>
-                                    <TextBlock Text="UPLOAD" VerticalAlignment="Center" Margin="12,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                </StackPanel>
-                                <TextBlock x:Name="UploadSpeedText" Grid.Row="1" Text="0.0 MB/s" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,16,0,4"/>
-                                <TextBlock Grid.Row="2" Text="Total: 450 MB" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            </Grid>
-                        </materialDesign:Card>
-
-                        <!-- Ping Card -->
-                        <materialDesign:Card Grid.Column="2" Margin="12,0,12,0" Padding="20" UniformCornerRadius="12" materialDesign:ElevationAssist.Elevation="Dp2">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <materialDesign:PackIcon Kind="Minus" Foreground="#FFC107" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Stable" Foreground="#FFC107" FontSize="12" Margin="4,0,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#FFF8E1" CornerRadius="8" Padding="8">
-                                        <materialDesign:PackIcon Kind="Pulse" Width="24" Height="24" Foreground="#FFC107"/>
-                                    </Border>
-                                    <TextBlock Text="PING" VerticalAlignment="Center" Margin="12,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                </StackPanel>
-                                <TextBlock x:Name="LatencyText" Grid.Row="1" Text="24 ms" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,16,0,4"/>
-                                <TextBlock Grid.Row="2" Text="Google DNS" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            </Grid>
-                        </materialDesign:Card>
-
-                        <!-- Signal Card -->
-                        <materialDesign:Card Grid.Column="3" Margin="12,0,0,0" Padding="20" UniformCornerRadius="12" materialDesign:ElevationAssist.Elevation="Dp2">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#F3E5F5" CornerRadius="8" Padding="8">
-                                        <materialDesign:PackIcon Kind="Signal" Width="24" Height="24" Foreground="#9C27B0"/>
-                                    </Border>
-                                    <TextBlock Text="SIGNAL" VerticalAlignment="Center" Margin="12,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                                </StackPanel>
-                                <TextBlock x:Name="SignalStrengthText" Grid.Row="1" Text="Strong" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,16,0,4"/>
-                                <TextBlock Grid.Row="2" Text="Connected" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
-                            </Grid>
-                        </materialDesign:Card>
-                    </Grid>
-
-                    <!-- Charts Area -->
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Main Traffic Chart -->
-                        <materialDesign:Card Grid.Column="0" Margin="0,0,12,0" Padding="24" UniformCornerRadius="12" materialDesign:ElevationAssist.Elevation="Dp2">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0" Margin="0,0,0,24">
-                                    <StackPanel>
-                                        <TextBlock Text="Network Activity" Style="{DynamicResource MaterialDesignHeadline6TextBlock}" FontWeight="Bold"/>
-                                        <TextBlock Text="Real-time upload and download speeds" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}" Margin="0,4,0,0"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                                        <RadioButton Style="{DynamicResource MaterialDesignChoiceChipOutlineRadioButton}" Content="Live" IsChecked="True" Margin="0,0,8,0"/>
-                                        <RadioButton Style="{DynamicResource MaterialDesignChoiceChipOutlineRadioButton}" Content="1H"/>
-                                    </StackPanel>
-                                </Grid>
-                                
-                                <lvc:CartesianChart x:Name="NetworkChart" Grid.Row="1" Height="300"
-                                                   Series="{Binding Series}"
-                                                   XAxes="{Binding XAxes}"
-                                                   YAxes="{Binding YAxes}"
-                                                   LegendPosition="Top"/>
-                            </Grid>
-                        </materialDesign:Card>
-
-                        <!-- Quick Actions / Top Apps -->
-                        <materialDesign:Card Grid.Column="1" Margin="12,0,0,0" Padding="24" UniformCornerRadius="12" materialDesign:ElevationAssist.Elevation="Dp2">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Quick Actions" Style="{DynamicResource MaterialDesignHeadline6TextBlock}" FontWeight="Bold" Margin="0,0,0,24"/>
-                                
-                                <StackPanel Grid.Row="1">
-                                    <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="0,0,0,12" HorizontalContentAlignment="Left" Height="50">
-                                        <StackPanel Orientation="Horizontal">
-                                            <materialDesign:PackIcon Kind="Speedometer" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                            <TextBlock Text="Run Speed Test" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Button>
-                                    <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="0,0,0,12" HorizontalContentAlignment="Left" Height="50">
-                                        <StackPanel Orientation="Horizontal">
-                                            <materialDesign:PackIcon Kind="WifiStrengthOff" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                            <TextBlock Text="Reset Adapter" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Button>
-                                    <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="0,0,0,12" HorizontalContentAlignment="Left" Height="50">
-                                        <StackPanel Orientation="Horizontal">
-                                            <materialDesign:PackIcon Kind="FileDocumentBox" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                            <TextBlock Text="Export Logs" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </materialDesign:Card>
-                    </Grid>
+                    </Border>
                 </Grid>
-            </ScrollViewer>
-        </Grid>
+
+                <!-- Stats Cards (Grid Layout) -->
+                <Grid Grid.Row="1" Margin="0,0,0,32">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Download -->
+                    <Border Grid.Column="0" Style="{StaticResource PremiumCard}">
+                        <Grid Margin="24">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#1E2835">
+                                    <materialDesign:PackIcon Kind="Download" Foreground="{StaticResource AccentColor}" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="DL" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="#888888" FontWeight="Bold"/>
+                            </StackPanel>
+                            
+                             <TextBlock x:Name="DownloadSpeedText" Grid.Row="1" Text="0.0 MB/s" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,16,0,0"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Upload -->
+                    <Border Grid.Column="2" Style="{StaticResource PremiumCard}">
+                        <Grid Margin="24">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#281E35">
+                                    <materialDesign:PackIcon Kind="Upload" Foreground="{StaticResource SecondaryAccent}" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="UL" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="#888888" FontWeight="Bold"/>
+                            </StackPanel>
+                            
+                             <TextBlock x:Name="UploadSpeedText" Grid.Row="1" Text="0.0 MB/s" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,16,0,0"/>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Ping -->
+                    <Border Grid.Column="4" Style="{StaticResource PremiumCard}">
+                        <Grid Margin="24">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#353520">
+                                    <materialDesign:PackIcon Kind="Pulse" Foreground="#FFC107" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="PING" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="#888888" FontWeight="Bold"/>
+                            </StackPanel>
+                            
+                             <TextBlock x:Name="LatencyText" Grid.Row="1" Text="24 ms" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,16,0,0"/>
+                        </Grid>
+                    </Border>
+                    
+                     <!-- Signal -->
+                    <Border Grid.Column="6" Style="{StaticResource PremiumCard}">
+                        <Grid Margin="24">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#203525">
+                                    <materialDesign:PackIcon Kind="Wifi" Foreground="#4CAF50" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="STATUS" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="#888888" FontWeight="Bold"/>
+                            </StackPanel>
+                            
+                             <TextBlock x:Name="SignalStrengthText" Grid.Row="1" Text="Good" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,20,0,0"/>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+
+                <!-- Main Chart Section -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="24"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource PremiumCard}" Height="400">
+                        <Grid Margin="24">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="16"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <TextBlock Text="Traffic Overview" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                            
+                            <lvc:CartesianChart x:Name="NetworkChart" Grid.Row="2"
+                                               Series="{Binding Series}"
+                                               XAxes="{Binding XAxes}"
+                                               YAxes="{Binding YAxes}"
+                                               LegendPosition="Top"
+                                               TooltipPosition="Top">
+                            </lvc:CartesianChart>
+                        </Grid>
+                    </Border>
+
+                     <!-- Quick Actions Stack -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Quick Actions" FontSize="18" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,16"/>
+                        
+                        <Button Style="{DynamicResource MaterialDesignRaisedButton}" Height="60" Margin="0,0,0,16" Background="#252525" BorderBrush="#333333" Foreground="White" materialDesign:ButtonAssist.CornerRadius="12">
+                             <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Speedometer" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Run Speed Test" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        
+                         <Button Style="{DynamicResource MaterialDesignRaisedButton}" Height="60" Margin="0,0,0,16" Background="#252525" BorderBrush="#333333" Foreground="White" materialDesign:ButtonAssist.CornerRadius="12">
+                             <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ChartBoxOutline" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="View Full Report" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        
+                         <Button Style="{DynamicResource MaterialDesignRaisedButton}" Height="60" Margin="0,0,0,16" Background="#252525" BorderBrush="#333333" Foreground="White" materialDesign:ButtonAssist.CornerRadius="12">
+                             <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Broom" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Clear History" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </Window>

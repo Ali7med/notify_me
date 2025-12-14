@@ -72,6 +72,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _uploadSpeedHistory = new ObservableCollection<double>(Enumerable.Repeat(0.0, 60));
         
         InitializeChart();
+        
+        // Configure Chart Legend
+        if (NetworkChart != null)
+        {
+            NetworkChart.LegendTextPaint = new SolidColorPaint(SKColors.White) { SKTypeface = SKTypeface.FromFamilyName("Segoe UI", SKFontStyle.Bold) };
+            NetworkChart.LegendBackgroundPaint = new SolidColorPaint(new SKColor(30, 30, 30));
+        }
 
         if (_networkMonitor != null)
         {
@@ -99,16 +106,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 Values = _downloadSpeedHistory,
                 Name = "Download",
                 Fill = null,
-                Stroke = new SolidColorPaint(SKColors.DeepSkyBlue) { StrokeThickness = 2 },
-                GeometrySize = 0
+                Stroke = new SolidColorPaint(SKColors.DeepSkyBlue) { StrokeThickness = 3 },
+                GeometrySize = 0,
+                GeometryStroke = new SolidColorPaint(SKColors.DeepSkyBlue) { StrokeThickness = 3 }
             },
             new LineSeries<double>
             {
                 Values = _uploadSpeedHistory,
                 Name = "Upload",
                 Fill = null,
-                Stroke = new SolidColorPaint(SKColors.LimeGreen) { StrokeThickness = 2 },
-                GeometrySize = 0
+                Stroke = new SolidColorPaint(SKColors.LimeGreen) { StrokeThickness = 3 },
+                GeometrySize = 0,
+                GeometryStroke = new SolidColorPaint(SKColors.LimeGreen) { StrokeThickness = 3 }
             }
         };
 
@@ -116,7 +125,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             new Axis
             {
-                IsVisible = false
+                Name = "Time (seconds)",
+                NamePaint = new SolidColorPaint(SKColors.LightGray),
+                LabelsPaint = new SolidColorPaint(SKColors.LightGray),
+                SeparatorsPaint = new SolidColorPaint(new SKColor(50, 50, 50)) { StrokeThickness = 1 },
+                ShowSeparatorLines = true
             }
         };
 
@@ -125,8 +138,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             new Axis
             {
                 Name = "Speed (MB/s)",
-                NamePaint = new SolidColorPaint(SKColors.Gray),
-                LabelsPaint = new SolidColorPaint(SKColors.Gray)
+                NamePaint = new SolidColorPaint(SKColors.LightGray),
+                LabelsPaint = new SolidColorPaint(SKColors.LightGray),
+                SeparatorsPaint = new SolidColorPaint(new SKColor(50, 50, 50)) { StrokeThickness = 1 },
+                ShowSeparatorLines = true,
+                MinLimit = 0
             }
         };
     }
